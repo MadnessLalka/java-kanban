@@ -199,8 +199,17 @@ public class TaskManager {
             return;
         }
 
-        System.out.println("Эпик удален");
+        Epic currentEpic = epicMap.get(epicId);
+
+        ArrayList<SubTask> subTasksCurrentEpic = getAllSubTaskByEpic(currentEpic);
+
+        for (SubTask st : subTasksCurrentEpic){
+            subTaskMap.remove(st.getId());
+        }
+
         epicMap.remove(epicId);
+
+        System.out.println("Эпик со всеми подзадачами был удалён");
 
     }
 
