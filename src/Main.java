@@ -59,7 +59,10 @@ public class Main {
         System.out.println(taskManager.getAllSubTaskList());
         System.out.println();
 
-
+        System.out.println(taskManager.getAllTaskList());
+        System.out.println(taskManager.getAllEpicList());
+        System.out.println(taskManager.getAllSubTaskList());
+        System.out.println();
 
     }
 }

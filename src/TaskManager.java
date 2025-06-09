@@ -90,7 +90,7 @@ public class TaskManager {
     }
 
     public void createTask(Task task) {
-        if (isTaskExist(task)) {
+        if (isTaskExist(taskMap.get(task.getId()))) {
             System.out.println("Такая задача " + task + " уже поставлена");
             return;
         }
@@ -111,7 +111,7 @@ public class TaskManager {
     }
 
     public void createEpic(Epic epic) {
-        if (isEpicExist(epic)) {
+        if (isEpicExist(epicMap.get(epic.getId()))) {
             System.out.println("Такой эпик " + epic + " уже поставлен");
             return;
         }
@@ -123,7 +123,7 @@ public class TaskManager {
     private Boolean isEpicExist(Epic epic) {
         ArrayList<Epic> allEpicList = getAllEpicList();
 
-        for (Task e : allEpicList) {
+        for (Epic e : allEpicList) {
             if (e.equals(epic)) {
                 return true;
             }
@@ -133,7 +133,7 @@ public class TaskManager {
     }
 
     public void createSubTask(SubTask subTask) {
-        if (isSubTaskExist(subTask)) {
+        if (isSubTaskExist(subTaskMap.get(subTask.getId()))) {
             System.out.println("Такая подзадача " + subTask + " уже поставлена");
             return;
         }
@@ -145,7 +145,7 @@ public class TaskManager {
     private Boolean isSubTaskExist(SubTask subTask) {
         ArrayList<SubTask> allSubTaskList = getAllSubTaskList();
 
-        for (Task sb : allSubTaskList) {
+        for (SubTask sb : allSubTaskList) {
             if (sb.equals(subTask)) {
                 return true;
             }
@@ -154,7 +154,7 @@ public class TaskManager {
     }
 
     public void updateTask(Task task) {
-        if (!isTaskExist(task)) {
+        if (!isTaskExist(taskMap.get(task.getId()))) {
             System.out.println("Такой задачи " + task + " нет в списках");
             return;
         }
@@ -164,7 +164,7 @@ public class TaskManager {
     }
 
     public void updateEpic(Epic epic) {
-        if (!isEpicExist(epic)) {
+        if (!isEpicExist(epicMap.get(epic.getId()))) {
             System.out.println("Такого эпика " + epic + "нет в списках");
             return;
         }
@@ -174,8 +174,8 @@ public class TaskManager {
     }
 
     public void updateSubTask(SubTask subTask) {
-        if (!isSubTaskExist(subTask)) {
-            System.out.println("Такого подзадачи " + subTask + " нет в списках");
+        if (!isSubTaskExist(subTaskMap.get(subTask.getId()))) {
+            System.out.println("Такой подзадачи '" + subTask.getName() + "' нет в списках");
             return;
         }
 
@@ -242,7 +242,7 @@ public class TaskManager {
     }
 
     public void updateTaskStatus(Task task, TaskStatus status) {
-        if (!isTaskExist(task)) {
+        if (!isTaskExist(taskMap.get(task.getId()))) {
             System.out.println("Такой задачи " + task + " нет в списках");
             return;
         }
@@ -254,7 +254,7 @@ public class TaskManager {
     }
 
     public void updateSubTaskStatus(SubTask subTask, TaskStatus status) {
-        if (!isSubTaskExist(subTask)) {
+        if (!isSubTaskExist(subTaskMap.get(subTask.getId()))) {
             System.out.println("Такой подзадачи " + subTask + " нет в списках");
             return;
         }
