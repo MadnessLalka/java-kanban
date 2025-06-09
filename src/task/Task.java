@@ -1,49 +1,51 @@
 package task;
 
-import java.util.Objects;
-
 public class Task {
-    private String taskName;
-    private String taskDescription;
-    private int taskId;
-    private TaskStatus taskStatus;
+    private String name;
+    private String description;
+    private int id;
+    private TaskStatus status;
 
-    public Task(String name, String description, int taskId, TaskStatus status) {
-        this.taskName = name;
-        this.taskDescription = description;
-        this.taskId = taskId;
-        this.taskStatus = status;
+    public Task(String name, String description, int id, TaskStatus status) {
+        this.name = name;
+        this.description = description;
+        this.id = id;
+        this.status = status;
     }
 
-    public String getTaskName() {
-        return taskName;
+    public Task(Task task, TaskStatus status) {
+        this.name = task.name;
+        this.description = task.description;
+        this.id = task.id;
+        this.status = status;
     }
 
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
+    public String getName() {
+        return name;
     }
 
-    public String getTaskDescription() {
-        return taskDescription;
+
+    public String getDescription() {
+        return description;
     }
 
-    public void setTaskDescription(String taskDescription) {
-        this.taskDescription = taskDescription;
+
+    public int getId() {
+        return id;
     }
 
-    public int getTaskId() {
-        return taskId;
+
+    public TaskStatus getStatus() {
+        return status;
     }
 
-    public void setTaskId(int taskId) {
-        this.taskId = taskId;
-    }
-
-    public TaskStatus getTaskStatus() {
-        return taskStatus;
-    }
-
-    public void setTaskStatus(TaskStatus taskStatus) {
-        this.taskStatus = taskStatus;
+    @Override
+    public String toString() {
+        return "Task{" +
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", id=" + id +
+                ", status=" + status +
+                '}';
     }
 }
