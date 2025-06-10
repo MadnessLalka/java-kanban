@@ -23,6 +23,10 @@ public class Epic extends Task {
         subTasksList.remove(subTask);
     }
 
+    public void clearSubTaskList(){
+        subTasksList.clear();
+    }
+
     public void setStatus() {
         if(subTasksList.isEmpty()){
             this.status = TaskStatus.NEW;
@@ -58,11 +62,6 @@ public class Epic extends Task {
         } else {
             this.status = TaskStatus.NEW;
         }
-
-    }
-
-    public void setSubTasksList(ArrayList<SubTask> subTasksList) {
-        this.subTasksList = subTasksList;
     }
 
     @Override
@@ -90,13 +89,4 @@ public class Epic extends Task {
                 ", subTaskList=" + subTasksList +
                 '}';
     }
-
-
-
-    //    public Epic(Epic epic, TaskStatus status) {
-//        super(epic.getName(), epic.getDescription(), epic.getId(), status);
-//    }
-
-
-
 }

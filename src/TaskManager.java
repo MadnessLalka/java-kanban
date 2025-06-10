@@ -1,7 +1,6 @@
 import task.Epic;
 import task.SubTask;
 import task.Task;
-import task.TaskStatus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,7 +55,7 @@ public class TaskManager {
         System.out.println("Все эпики удалены");
 
         for (Epic epic: epicMap.values()){
-            epic.setSubTasksList(null);
+            epic.clearSubTaskList();
         }
 
         subTaskMap.clear();
@@ -67,7 +66,8 @@ public class TaskManager {
         System.out.println("Все подзадачи удалены");
 
         for (Epic epic: epicMap.values()){
-            epic.setSubTasksList(null);
+            epic.clearSubTaskList();
+            epic.setStatus();
         }
 
         subTaskMap.clear();
@@ -196,6 +196,8 @@ public class TaskManager {
             return;
         }
 
+        epic.setStatus();
+
         System.out.println("Эпик обновлен");
         epicMap.put(epic.getId(), epic);
     }
@@ -205,6 +207,12 @@ public class TaskManager {
             System.out.println("Такой подзадачи '" + subTask.getName() + "' нет в списках");
             return;
         }
+
+        Epic currentEpic = getEpicById(subTask.getEpicId());
+        SubTask oldSubTask = getSubTaskById(subTask.getId());
+
+        currentEpic.removeSubTaskToList(oldSubTask);
+        currentEpic.addSubTaskToList(subTask);
 
         System.out.println("Подзадача обновлена");
         subTaskMap.put(subTask.getId(), subTask);
@@ -276,63 +284,6 @@ public class TaskManager {
 
         return subTaskListByEpic;
     }
-
- /*   public void updateTaskStatus(Task task, TaskStatus status) {
-        if (!isTaskExist(taskMap.get(task.getId()))) {
-            System.out.println("Такой задачи " + task + " нет в списках");
-            return;
-        }
-
-        System.out.println("Статус задачи " + task.getId() + " : '" + task.getName() + "' был обновлён на " + status);
-        Task taskWithNewStatus = new Task(task, status);
-        taskMap.put(task.getId(), taskWithNewStatus);
-
-    }*/
-
-  /*  public void updateSubTaskStatus(SubTask subTask, TaskStatus status) {
-        if (!isSubTaskExist(subTaskMap.get(subTask.getId()))) {
-            System.out.println("Такой подзадачи " + subTask + " нет в списках");
-            return;
-        }
-
-        System.out.println("Статус подзадачи " + subTask.getId() + " : '" + subTask.getName() + "' обновлён " + status);
-        SubTask subTaskWithNewStatus = new SubTask(subTask, status);
-        subTaskMap.put(subTask.getId(), subTaskWithNewStatus);
-
-        Epic epic = getEpicById(subTaskWithNewStatus.getEpicId());
-
-        if (isSubTaskByEpicEmpty(epic)) {
-            return;
-        }
-
-       /* if (isAllSubTaskDone(epic)) {
-            epicMap.put(epic.getId(), new Epic(epic, TaskStatus.DONE));
-            return;
-        }*/
-
-        /*if (subTaskWithNewStatus.getStatus() == TaskStatus.IN_PROGRESS ||
-                subTaskWithNewStatus.getStatus() == TaskStatus.DONE) {
-            epicMap.put(epic.getId(), new Epic(epic, TaskStatus.IN_PROGRESS));
-        }*/
-    //}
-
-    private boolean isSubTaskByEpicEmpty(Epic epic) {
-        ArrayList<SubTask> subTasksList = getAllSubTaskByEpic(epic);
-
-        return subTasksList.isEmpty();
-    }
-
-    private boolean isAllSubTaskDone(Epic epic) {
-        ArrayList<SubTask> subTasksList = getAllSubTaskByEpic(epic);
-        boolean isAllSubTaskDone = false;
-
-        for (SubTask st : subTasksList) {
-            isAllSubTaskDone = st.getStatus() == TaskStatus.DONE;
-        }
-
-        return isAllSubTaskDone;
-    }
-
 
     @Override
     public boolean equals(Object o) {
