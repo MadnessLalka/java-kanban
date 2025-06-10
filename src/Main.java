@@ -38,20 +38,15 @@ public class Main {
         taskManager.createSubTask(firstSubTask);
         taskManager.createSubTask(secondSubTask);
 
+        System.out.println(taskManager.getAllEpicList());
+
+        taskManager.removeAllSubTask();
+
+
         System.out.println(taskManager.getAllTaskList());
         System.out.println(taskManager.getAllEpicList());
-        System.out.println();
+        System.out.println(taskManager.getAllSubTaskList());
 
-        taskManager.removeSubTaskById(secondSubTask.getId());
-
-        System.out.println(taskManager.getAllEpicList());
-        System.out.println();
-
-
-        taskManager.removeSubTaskById(firstSubTask.getId());
-
-        System.out.println(taskManager.getAllEpicList());
-        System.out.println();
 
        // taskManager.removeSubTaskById(secondSubTask.getId());
 
@@ -70,18 +65,11 @@ public class Main {
         System.out.println(taskManager.getAllSubTaskList());
         System.out.println();
 
-        taskManager.updateTaskStatus(firstTask, TaskStatus.IN_PROGRESS);
-        taskManager.updateTaskStatus(secondTask, TaskStatus.DONE);
-
-        taskManager.updateSubTaskStatus(firstSubTask, TaskStatus.DONE);
-        taskManager.updateSubTaskStatus(secondSubTask, TaskStatus.NEW);
-
-        taskManager.updateSubTaskStatus(thirdSubTask, TaskStatus.DONE);
-
         System.out.println(taskManager.getAllTaskList());
         System.out.println(taskManager.getAllEpicList());
         System.out.println(taskManager.getAllSubTaskList());
         System.out.println();
+
 
         taskManager.removeTaskById(firstTask.getId());
         taskManager.removeEpicById(firstEpic.getId());

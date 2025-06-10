@@ -59,11 +59,17 @@ public class TaskManager {
             epic.setSubTasksList(null);
         }
 
+        subTaskMap.clear();
         epicMap.clear();
     }
 
     public void removeAllSubTask() {
         System.out.println("Все подзадачи удалены");
+
+        for (Epic epic: epicMap.values()){
+            epic.setSubTasksList(null);
+        }
+
         subTaskMap.clear();
     }
 
