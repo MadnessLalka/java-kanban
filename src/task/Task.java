@@ -13,11 +13,10 @@ public class Task {
         this.status = status;
     }
 
-    public Task(Task task, TaskStatus status) {
-        this.name = task.name;
-        this.description = task.description;
-        this.id = task.id;
-        this.status = status;
+    protected Task(String name, String description, int id) {
+        this.name = name;
+        this.description = description;
+        this.id = id;
     }
 
     public String getName() {
