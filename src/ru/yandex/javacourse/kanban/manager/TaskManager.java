@@ -79,7 +79,6 @@ public class TaskManager {
     public Task getTaskById(int taskId) {
         if (!isTaskExist(taskMap.get(taskId))) {
             System.out.println("Задачи по id " + taskId + " - нет в списке");
-            return null;
         }
 
         return taskMap.get(taskId);
@@ -88,7 +87,6 @@ public class TaskManager {
     public Epic getEpicById(int epicId) {
         if (!isEpicExist(epicMap.get(epicId))) {
             System.out.println("Эпика по такому id " + epicId + " нет");
-            return null;
         }
         return epicMap.get(epicId);
     }
@@ -96,7 +94,6 @@ public class TaskManager {
     public SubTask getSubTaskById(int subTaskId) {
         if (!isSubTaskExist(subTaskMap.get(subTaskId))) {
             System.out.println("Подзадачи по такому id" + subTaskId + "нет");
-            return null;
         }
 
         return subTaskMap.get(subTaskId);
@@ -113,14 +110,7 @@ public class TaskManager {
     }
 
     private Boolean isTaskExist(Task task) {
-        ArrayList<Task> allTaskList = getAllTaskList();
-
-        for (Task t : allTaskList) {
-            if (t.equals(task)) {
-                return true;
-            }
-        }
-        return false;
+        return getAllTaskList().contains(task);
     }
 
     public void createEpic(Epic epic) {
@@ -136,15 +126,7 @@ public class TaskManager {
     }
 
     private Boolean isEpicExist(Epic epic) {
-        ArrayList<Epic> allEpicList = getAllEpicList();
-
-        for (Epic e : allEpicList) {
-            if (e.equals(epic)) {
-                return true;
-            }
-        }
-
-        return false;
+        return getAllEpicList().contains(epic);
     }
 
     public void createSubTask(SubTask subTask) {
@@ -172,14 +154,7 @@ public class TaskManager {
     }
 
     private Boolean isSubTaskExist(SubTask subTask) {
-        ArrayList<SubTask> allSubTaskList = getAllSubTaskList();
-
-        for (SubTask sb : allSubTaskList) {
-            if (sb.equals(subTask)) {
-                return true;
-            }
-        }
-        return false;
+        return getAllSubTaskList().contains(subTask);
     }
 
     public void updateTask(Task task) {
@@ -293,5 +268,10 @@ public class TaskManager {
         if (o == null || getClass() != o.getClass()) return false;
         TaskManager that = (TaskManager) o;
         return idCounter == that.idCounter;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(idCounter);
     }
 }

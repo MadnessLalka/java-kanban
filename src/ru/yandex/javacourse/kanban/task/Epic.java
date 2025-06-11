@@ -1,10 +1,11 @@
 package ru.yandex.javacourse.kanban.task;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Epic extends Task {
     private TaskStatus status;
-    private ArrayList<SubTask> subTasksList = new ArrayList<>();
+    private final ArrayList<SubTask> subTasksList = new ArrayList<>();
 
     public Epic(String name, String description, int taskId) {
         super(name, description, taskId);
@@ -88,5 +89,18 @@ public class Epic extends Task {
                 ", status=" + status +
                 ", subTaskList=" + subTasksList +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Epic epic = (Epic) o;
+        return super.getId() == epic.getId() && Objects.equals(super.getId(), epic.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(super.getId());
     }
 }

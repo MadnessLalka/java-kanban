@@ -1,9 +1,11 @@
 package ru.yandex.javacourse.kanban.task;
 
+import java.util.Objects;
+
 public class Task {
-    private String name;
-    private String description;
-    private int id;
+    private final String name;
+    private final String description;
+    private final int id;
     private TaskStatus status;
 
     public Task(String name, String description, int id, TaskStatus status) {
@@ -46,5 +48,18 @@ public class Task {
                 ", id=" + id +
                 ", status=" + status +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Task task = (Task) o;
+        return id == task.getId() && Objects.equals(id, task.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
     }
 }

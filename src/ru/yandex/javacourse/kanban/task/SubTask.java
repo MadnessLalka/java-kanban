@@ -1,7 +1,9 @@
 package ru.yandex.javacourse.kanban.task;
 
+import java.util.Objects;
+
 public class SubTask extends Task {
-    private int epicId;
+    private final int epicId;
 
     public SubTask(String name, String description, int taskId, TaskStatus status, int epicId) {
         super(name, description, taskId, status);
@@ -22,4 +24,19 @@ public class SubTask extends Task {
                 ", EpicId=" + getEpicId() +
                 '}';
     }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SubTask subTask = (SubTask) o;
+        return super.getId() == subTask.getId() && Objects.equals(super.getId(), subTask.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(super.getId());
+    }
+
 }
