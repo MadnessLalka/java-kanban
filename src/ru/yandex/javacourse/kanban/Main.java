@@ -1,3 +1,5 @@
+package ru.yandex.javacourse.kanban;
+
 import ru.yandex.javacourse.kanban.manager.TaskManager;
 import ru.yandex.javacourse.kanban.task.Epic;
 import ru.yandex.javacourse.kanban.task.SubTask;
