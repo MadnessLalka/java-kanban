@@ -1,6 +1,8 @@
-import task.Epic;
-import task.SubTask;
-import task.Task;
+package ru.yandex.javacourse.kanban.manager;
+
+import ru.yandex.javacourse.kanban.task.Epic;
+import ru.yandex.javacourse.kanban.task.SubTask;
+import ru.yandex.javacourse.kanban.task.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;

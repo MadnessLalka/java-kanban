@@ -1,4 +1,4 @@
-package task;
+package ru.yandex.javacourse.kanban.task;
 
 public class Task {
     private String name;

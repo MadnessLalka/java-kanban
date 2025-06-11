@@ -1,7 +1,8 @@
-import task.Epic;
-import task.SubTask;
-import task.Task;
-import task.TaskStatus;
+import ru.yandex.javacourse.kanban.manager.TaskManager;
+import ru.yandex.javacourse.kanban.task.Epic;
+import ru.yandex.javacourse.kanban.task.SubTask;
+import ru.yandex.javacourse.kanban.task.Task;
+import ru.yandex.javacourse.kanban.task.TaskStatus;
 
 public class Main {
 

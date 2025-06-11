@@ -1,4 +1,4 @@
-package task;
+package ru.yandex.javacourse.kanban.task;
 
 import java.util.ArrayList;
 
