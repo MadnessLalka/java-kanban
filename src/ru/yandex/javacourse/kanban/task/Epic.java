@@ -9,6 +9,7 @@ public class Epic extends Task {
 
     public Epic(String name, String description, int taskId) {
         super(name, description, taskId);
+        this.status = TaskStatus.NEW;
     }
 
     @Override

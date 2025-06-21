@@ -1,5 +1,6 @@
 package ru.yandex.javacourse.kanban;
 
+import ru.yandex.javacourse.kanban.manager.InMemoryTaskManager;
 import ru.yandex.javacourse.kanban.manager.TaskManager;
 import ru.yandex.javacourse.kanban.task.Epic;
 import ru.yandex.javacourse.kanban.task.SubTask;
@@ -10,7 +11,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        TaskManager taskManager = new TaskManager();
+        TaskManager taskManager = new InMemoryTaskManager();
 
         Task firstTask = new Task("Первая задача", "Описание первой задачи", taskManager.getNewId(),
                 TaskStatus.NEW);
