@@ -8,14 +8,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 
-public class InMemoryTaskManager <T extends Task> implements TaskManager {
+public class InMemoryTaskManager implements TaskManager {
     private int idCounter = 0;
+
 
     private HashMap<Integer, Task> taskMap = new HashMap<>();
     private HashMap<Integer, Epic> epicMap = new HashMap<>();
     private HashMap<Integer, SubTask> subTaskMap = new HashMap<>();
 
-    private final ArrayList<Task> itemViewHistoryList = new ArrayList<>(VIEW_LIST_HISTORY_SIZE);
+//    HistoryManager historyManager = Managers.getDefaultHistory();
 
     @Override
     public int getNewId() {
@@ -91,12 +92,7 @@ public class InMemoryTaskManager <T extends Task> implements TaskManager {
             System.out.println("Задачи по id " + taskId + " - нет в списке");
         }
 
-        Task currentTask = taskMap.get(taskId);
-
-        historyViewListCleaner();
-        itemViewHistoryList.add(currentTask);
-
-        return currentTask;
+        return taskMap.get(taskId);
     }
 
     @Override
@@ -105,24 +101,15 @@ public class InMemoryTaskManager <T extends Task> implements TaskManager {
             System.out.println("Эпика по такому id " + epicId + " нет");
         }
 
-        Epic currentEpic = epicMap.get(epicId);
-
-        historyViewListCleaner();
-        itemViewHistoryList.add(currentEpic);
-
         return epicMap.get(epicId);
     }
 
     @Override
     public SubTask getSubTaskById(int subTaskId) {
         if (!isSubTaskExist(subTaskMap.get(subTaskId))) {
-            System.out.println("Подзадачи по такому id" + subTaskId + "нет");
+            System.out.println("Подзадачи по такому id " + subTaskId + " нет");
+
         }
-
-        SubTask currentSubTask = subTaskMap.get(subTaskId);
-
-        historyViewListCleaner();
-        itemViewHistoryList.add(currentSubTask);
 
         return subTaskMap.get(subTaskId);
     }
@@ -167,7 +154,7 @@ public class InMemoryTaskManager <T extends Task> implements TaskManager {
         }
 
         Epic currentEpic = getEpicById(subTask.getEpicId());
-        itemViewHistoryList.remove(currentEpic);
+//        historyManager.remove(currentEpic);
         currentEpic.addSubTaskToList(subTask);
 
         subTaskMap.put(subTask.getId(), subTask);
@@ -283,7 +270,7 @@ public class InMemoryTaskManager <T extends Task> implements TaskManager {
     }
 
     @Override
-    public ArrayList<SubTask> getAllSubTaskByEpic(Epic epic) {
+    public ArrayList<SubTask> getAllSubTaskByEpic(Task epic) {
         ArrayList<SubTask> allSubTaskList = getAllSubTaskList();
         ArrayList<SubTask> subTaskListByEpic = new ArrayList<>();
 
@@ -302,16 +289,6 @@ public class InMemoryTaskManager <T extends Task> implements TaskManager {
     }
 
     @Override
-    public ArrayList<Task> getHistory() {
-        if (itemViewHistoryList.isEmpty()) {
-            System.out.println("Список просмотров пуст");
-            return itemViewHistoryList;
-        }
-
-        return itemViewHistoryList;
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -323,16 +300,5 @@ public class InMemoryTaskManager <T extends Task> implements TaskManager {
     public int hashCode() {
         return Objects.hashCode(idCounter);
     }
-
-    private void historyViewListCleaner() {
-        if (isHistoryViewListFull()){
-            itemViewHistoryList.removeFirst();
-        }
-    }
-
-    private Boolean isHistoryViewListFull(){
-        return itemViewHistoryList.size() >= VIEW_LIST_HISTORY_SIZE;
-    }
-
 
 }

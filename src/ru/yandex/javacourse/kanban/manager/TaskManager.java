@@ -9,8 +9,6 @@ import java.util.ArrayList;
 public interface TaskManager {
     int getNewId();
 
-    static final int VIEW_LIST_HISTORY_SIZE = 10;
-
     ArrayList<Task> getAllTaskList();
 
     ArrayList<Epic> getAllEpicList();
@@ -47,9 +45,9 @@ public interface TaskManager {
 
     void removeSubTaskById(Integer subTaskId);
 
-    ArrayList<SubTask> getAllSubTaskByEpic(Epic epic);
+    ArrayList<SubTask> getAllSubTaskByEpic(Task epic);
 
-    ArrayList<Task> getHistory();
+//    ArrayList<Task> getHistory();
 
     @Override
     boolean equals(Object o);

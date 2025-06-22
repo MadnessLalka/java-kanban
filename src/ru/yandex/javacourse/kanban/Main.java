@@ -1,6 +1,7 @@
 package ru.yandex.javacourse.kanban;
 
-import ru.yandex.javacourse.kanban.manager.InMemoryTaskManager;
+import ru.yandex.javacourse.kanban.manager.HistoryManager;
+import ru.yandex.javacourse.kanban.manager.Managers;
 import ru.yandex.javacourse.kanban.manager.TaskManager;
 import ru.yandex.javacourse.kanban.task.Epic;
 import ru.yandex.javacourse.kanban.task.SubTask;
@@ -10,8 +11,9 @@ import ru.yandex.javacourse.kanban.task.TaskStatus;
 public class Main {
 
     public static void main(String[] args) {
+        TaskManager taskManager = Managers.getDefault();
+        HistoryManager historyManager = Managers.getDefaultHistory();
 
-        TaskManager taskManager = new InMemoryTaskManager();
 
         Task firstTask = new Task("Первая задача", "Описание первой задачи", taskManager.getNewId(),
                 TaskStatus.NEW);
@@ -45,6 +47,15 @@ public class Main {
         System.out.println(taskManager.getAllSubTaskList());
         System.out.println();
 
+        historyManager.add(taskManager.getTaskById(firstTask.getId()));
+        historyManager.add(taskManager.getTaskById(firstTask.getId()));
+        historyManager.add(taskManager.getEpicById(firstEpic.getId()));
+
+        System.out.println("История просмотров");
+        System.out.println(historyManager.getHistory());
+        System.out.println();
+
+
         taskManager.updateTask(new Task("Первая задача", "Описание изменено", firstTask.getId(),
                 TaskStatus.DONE));
 
@@ -64,6 +75,8 @@ public class Main {
         System.out.println(taskManager.getAllEpicList());
         System.out.println(taskManager.getAllSubTaskList());
         System.out.println();
+
+
 
     }
 }
