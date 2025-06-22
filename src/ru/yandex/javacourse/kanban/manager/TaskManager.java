@@ -47,8 +47,6 @@ public interface TaskManager {
 
     ArrayList<SubTask> getAllSubTaskByEpic(Task epic);
 
-//    ArrayList<Task> getHistory();
-
     @Override
     boolean equals(Object o);
 

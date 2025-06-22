@@ -17,43 +17,43 @@ public class Epic extends Task {
         return status;
     }
 
-    public void addSubTaskToList(SubTask subTask){
+    public void addSubTaskToList(SubTask subTask) {
         subTasksList.add(subTask);
     }
 
-    public void removeSubTaskToList(SubTask subTask){
+    public void removeSubTaskToList(SubTask subTask) {
         subTasksList.remove(subTask);
     }
 
-    public void clearSubTaskList(){
+    public void clearSubTaskList() {
         subTasksList.clear();
     }
 
     public void setStatus() {
-        if(subTasksList.isEmpty()){
+        if (subTasksList.isEmpty()) {
             this.status = TaskStatus.NEW;
             return;
         }
 
         boolean isDone = false;
 
-        for (SubTask st : subTasksList){
-            if (st.getStatus() == TaskStatus.DONE){
+        for (SubTask st : subTasksList) {
+            if (st.getStatus() == TaskStatus.DONE) {
                 isDone = true;
             } else {
                 isDone = false;
-               break;
+                break;
             }
         }
 
-        if (isDone){
+        if (isDone) {
             this.status = TaskStatus.DONE;
             return;
         }
 
         boolean isInProgress = false;
-        for (SubTask st : subTasksList){
-            if (st.getStatus() == TaskStatus.IN_PROGRESS || st.getStatus() == TaskStatus.DONE){
+        for (SubTask st : subTasksList) {
+            if (st.getStatus() == TaskStatus.IN_PROGRESS || st.getStatus() == TaskStatus.DONE) {
                 isInProgress = true;
                 break;
             }
@@ -85,7 +85,7 @@ public class Epic extends Task {
     public String toString() {
         return "Epic{" +
                 "name='" + super.getName() + '\'' +
-                ", description='" + super.getDescription()+ '\'' +
+                ", description='" + super.getDescription() + '\'' +
                 ", id=" + super.getId() +
                 ", status=" + status +
                 ", subTaskList=" + subTasksList +

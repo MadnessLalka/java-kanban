@@ -5,7 +5,7 @@ import ru.yandex.javacourse.kanban.task.Task;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class InMemoryHistoryManager implements HistoryManager{
+public class InMemoryHistoryManager implements HistoryManager {
 
     private static final int VIEW_LIST_HISTORY_SIZE = 10;
     private final ArrayList<Task> itemViewHistoryList = new ArrayList<>(VIEW_LIST_HISTORY_SIZE);
@@ -27,12 +27,12 @@ public class InMemoryHistoryManager implements HistoryManager{
     }
 
     private void historyViewListCleaner() {
-        if (isHistoryViewListFull()){
+        if (isHistoryViewListFull()) {
             itemViewHistoryList.removeFirst();
         }
     }
 
-    private Boolean isHistoryViewListFull(){
+    private Boolean isHistoryViewListFull() {
         return itemViewHistoryList.size() >= VIEW_LIST_HISTORY_SIZE;
     }
 

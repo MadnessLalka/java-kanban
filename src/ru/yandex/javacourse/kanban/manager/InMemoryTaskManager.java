@@ -11,12 +11,9 @@ import java.util.Objects;
 public class InMemoryTaskManager implements TaskManager {
     private int idCounter = 0;
 
-
     private HashMap<Integer, Task> taskMap = new HashMap<>();
     private HashMap<Integer, Epic> epicMap = new HashMap<>();
     private HashMap<Integer, SubTask> subTaskMap = new HashMap<>();
-
-//    HistoryManager historyManager = Managers.getDefaultHistory();
 
     @Override
     public int getNewId() {
@@ -66,7 +63,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void removeAllEpic() {
         System.out.println("Все эпики удалены");
 
-        for (Epic epic: epicMap.values()){
+        for (Epic epic : epicMap.values()) {
             epic.clearSubTaskList();
         }
 
@@ -78,7 +75,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void removeAllSubTask() {
         System.out.println("Все подзадачи удалены");
 
-        for (Epic epic: epicMap.values()){
+        for (Epic epic : epicMap.values()) {
             epic.clearSubTaskList();
             epic.setStatus();
         }
