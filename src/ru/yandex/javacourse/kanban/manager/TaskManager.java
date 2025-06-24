@@ -9,6 +9,8 @@ import java.util.ArrayList;
 public interface TaskManager {
     int getNewId();
 
+    int getIdCounter();
+
     ArrayList<Task> getAllTaskList();
 
     ArrayList<Epic> getAllEpicList();

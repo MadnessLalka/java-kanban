@@ -21,6 +21,11 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
+    public int getIdCounter() {
+        return idCounter;
+    }
+
+    @Override
     public ArrayList<Task> getAllTaskList() {
         ArrayList<Task> taskList = new ArrayList<>();
 
@@ -151,7 +156,6 @@ public class InMemoryTaskManager implements TaskManager {
         }
 
         Epic currentEpic = getEpicById(subTask.getEpicId());
-//        historyManager.remove(currentEpic);
         currentEpic.addSubTaskToList(subTask);
 
         subTaskMap.put(subTask.getId(), subTask);
@@ -235,7 +239,6 @@ public class InMemoryTaskManager implements TaskManager {
         }
 
         Epic currentEpic = epicMap.get(epicId);
-
         ArrayList<SubTask> subTasksCurrentEpic = getAllSubTaskByEpic(currentEpic);
 
         for (SubTask st : subTasksCurrentEpic) {

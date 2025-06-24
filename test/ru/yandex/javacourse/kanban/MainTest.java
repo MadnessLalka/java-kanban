@@ -97,9 +97,10 @@ class MainTest {
     void taskManager_Compare_EqualsTasks() {
         //given
         Task task = taskManager.getTaskById(0);
+        Task taskClone = taskManager.getTaskById(0);
 
         //then
-        assertEquals(task, task, "Задачи с одинаковым ID - должны быть эквиваленты");
+        assertEquals(task, taskClone, "Задачи с одинаковым ID - должны быть эквиваленты");
     }
 
     @DisplayName("Проверка одинаковых эпиков")
@@ -107,9 +108,10 @@ class MainTest {
     void taskManager_Compare_EqualsEpics() {
         //given
         Epic epic = taskManager.getEpicById(1);
+        Epic epicClone = taskManager.getEpicById(1);
 
         //then
-        assertEquals(epic, epic, "Эпики с одинаковым ID - должны быть эквиваленты");
+        assertEquals(epic, epicClone, "Эпики с одинаковым ID - должны быть эквиваленты");
     }
 
 
@@ -118,9 +120,10 @@ class MainTest {
     void taskManager_Compare_EqualsSubTasks() {
         //given
         SubTask subTask = taskManager.getSubTaskById(2);
+        SubTask subTaskClone = taskManager.getSubTaskById(2);
 
         //then
-        assertEquals(subTask, subTask, "Подзадачи с одинаковым ID - должны быть эквиваленты");
+        assertEquals(subTask, subTaskClone, "Подзадачи с одинаковым ID - должны быть эквиваленты");
     }
 
     @DisplayName("Проверка одинаковых менеджеров задач")
