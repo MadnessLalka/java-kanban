@@ -5,9 +5,10 @@ import ru.yandex.javacourse.kanban.task.Task;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import static ru.yandex.javacourse.kanban.manager.Stubs.VIEW_LIST_HISTORY_SIZE;
+
 public class InMemoryHistoryManager implements HistoryManager {
 
-    private static final int VIEW_LIST_HISTORY_SIZE = 10;
     private final ArrayList<Task> itemViewHistoryList = new ArrayList<>(VIEW_LIST_HISTORY_SIZE);
 
     @Override

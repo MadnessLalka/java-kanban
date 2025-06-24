@@ -133,7 +133,7 @@ class MainTest {
         TaskManager taskManager = Managers.getDefault();
 
         //then
-        assertEquals(taskManager, taskManager, "Менеджеры задач должен быть эквиваленты");
+        assertEquals(taskManager, taskManager, "Менеджеры задач должен быть эквивалентны");
     }
 
     @DisplayName("Проверка одинаковых менеджеров истории")
@@ -143,7 +143,7 @@ class MainTest {
         HistoryManager historyManager = Managers.getDefaultHistory();
 
         //then
-        assertEquals(historyManager, historyManager, "Менеджер истории должен быть эквиваленты");
+        assertEquals(historyManager, historyManager, "Менеджер истории должен быть эквивалентны");
     }
 
 
