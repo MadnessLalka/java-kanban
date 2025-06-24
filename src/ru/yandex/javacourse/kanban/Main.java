@@ -14,7 +14,6 @@ public class Main {
         TaskManager taskManager = Managers.getDefault();
         HistoryManager historyManager = Managers.getDefaultHistory();
 
-
         Task firstTask = new Task("Первая задача", "Описание первой задачи", taskManager.getNewId(),
                 TaskStatus.NEW);
         Task secondTask = new Task("Вторая задача", "Описание второй задачи", taskManager.getNewId(),

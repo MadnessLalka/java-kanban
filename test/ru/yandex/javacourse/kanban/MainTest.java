@@ -146,7 +146,6 @@ class MainTest {
         assertEquals(historyManager, historyManager, "Менеджер истории должен быть эквивалентны");
     }
 
-
     @DisplayName("Добавление задач разных типов")
     @Test
     void taskManager_Added_TasksAnotherTypes() {

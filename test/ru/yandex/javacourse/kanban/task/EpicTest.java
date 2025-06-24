@@ -87,11 +87,4 @@ public class EpicTest {
         //then
         assertEquals(TaskStatus.NEW, newEpic.getStatus(), "Статус пустого эпика должен быть NEW");
     }
-
-
-
-
-
-
-
 }
