@@ -3,38 +3,41 @@ package ru.yandex.javacourse.kanban.manager;
 import ru.yandex.javacourse.kanban.task.Task;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Objects;
-
-import static ru.yandex.javacourse.kanban.manager.Stubs.VIEW_LIST_HISTORY_SIZE;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-    private final ArrayList<Task> itemViewHistoryList = new ArrayList<>(VIEW_LIST_HISTORY_SIZE);
+    private final ArrayList<Task> itemViewHistoryList = new ArrayList<>();
+    private final LinkedList<Task> pullViewTasks = new LinkedList<>();
+    private final HashMap<Integer, LinkedList<Task>> historyMap = new HashMap<>();
 
     @Override
     public ArrayList<Task> getHistory() {
-        if (itemViewHistoryList.isEmpty()) {
+        if (pullViewTasks.isEmpty()) {
             System.out.println("Список просмотров пуст");
+            itemViewHistoryList.clear();
             return itemViewHistoryList;
         }
 
+//        itemViewHistoryList.addAll(pullViewTasks);
         return itemViewHistoryList;
     }
 
     @Override
     public void add(Task task) {
         historyViewListCleaner();
-        itemViewHistoryList.add(task);
+        pullViewTasks.add(Node<Task>);
+    }
+
+    @Override
+    public void remove(int id) {
+
     }
 
     private void historyViewListCleaner() {
-        if (isHistoryViewListFull()) {
-            itemViewHistoryList.removeFirst();
-        }
-    }
 
-    private Boolean isHistoryViewListFull() {
-        return itemViewHistoryList.size() >= VIEW_LIST_HISTORY_SIZE;
     }
 
     @Override

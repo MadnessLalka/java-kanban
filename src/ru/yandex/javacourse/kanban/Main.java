@@ -54,7 +54,6 @@ public class Main {
         System.out.println(historyManager.getHistory());
         System.out.println();
 
-
         taskManager.updateTask(new Task("Первая задача", "Описание изменено", firstTask.getId(),
                 TaskStatus.DONE));
 
@@ -74,7 +73,5 @@ public class Main {
         System.out.println(taskManager.getAllEpicList());
         System.out.println(taskManager.getAllSubTaskList());
         System.out.println();
-
-
     }
 }
