@@ -60,11 +60,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     private void linkLast(Task task) {
-        Node<Task> newNode = new Node<>(task, head, tail);
-
-        System.out.println(newNode.data);
-        System.out.println(newNode.prev);
-        System.out.println(newNode.next);
+        Node<Task> newNode = new Node<>(tail, task, null);
 
         if (tail != null) {
             tail.next = newNode;
@@ -89,8 +85,19 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     public void removeNode(Task task) {
-        int nodeId = task.getId();
-        remove(nodeId);
+
+        remove(task.getId());
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        InMemoryHistoryManager that = (InMemoryHistoryManager) o;
+        return Objects.equals(historyMap, that.historyMap);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(historyMap);
+    }
 }
