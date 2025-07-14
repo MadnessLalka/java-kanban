@@ -46,9 +46,11 @@ public class Main {
         System.out.println(taskManager.getAllSubTaskList());
         System.out.println();
 
-        historyManager.add(taskManager.getTaskById(firstTask.getId()));
-        historyManager.add(taskManager.getTaskById(firstTask.getId()));
-        historyManager.add(taskManager.getEpicById(firstEpic.getId()));
+        historyManager.add(firstTask);
+        historyManager.add(firstTask);
+        historyManager.add(secondTask);
+        historyManager.add(firstEpic);
+        historyManager.add(firstTask);
 
         System.out.println("История просмотров");
         System.out.println(historyManager.getHistory());

@@ -2,53 +2,95 @@ package ru.yandex.javacourse.kanban.manager;
 
 import ru.yandex.javacourse.kanban.task.Task;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Objects;
+import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-    private final ArrayList<Task> itemViewHistoryList = new ArrayList<>();
-    private final LinkedList<Task> pullViewTasks = new LinkedList<>();
-    private final HashMap<Integer, LinkedList<Task>> historyMap = new HashMap<>();
+    private Node<Task> head;
+    private Node<Task> tail;
+
+    private final HashMap<Integer, Node<Task>> historyMap = new LinkedHashMap<>();
 
     @Override
     public ArrayList<Task> getHistory() {
-        if (pullViewTasks.isEmpty()) {
+
+        ArrayList<Task> historyList = new ArrayList<>(getTasks());
+
+        if (historyList.isEmpty()) {
             System.out.println("Список просмотров пуст");
-            itemViewHistoryList.clear();
-            return itemViewHistoryList;
+            return historyList;
         }
 
-//        itemViewHistoryList.addAll(pullViewTasks);
-        return itemViewHistoryList;
+        return historyList;
     }
 
     @Override
     public void add(Task task) {
-        historyViewListCleaner();
-        pullViewTasks.add(Node<Task>);
+        removeNode(task);
+        linkLast(task);
     }
 
     @Override
     public void remove(int id) {
+        if (!historyMap.containsKey(id)) {
+            System.out.println("Задачи с id " + id + " нет в истории просмотров");
+            return;
+        }
 
+        Node<Task> node = historyMap.remove(id);
+
+        if (node == null) return;
+
+        Node<Task> prev = node.prev;
+        Node<Task> next = node.next;
+
+        if (prev != null) {
+            prev.next = next;
+        } else {
+            head = next;
+        }
+
+        if (next != null) {
+            next.prev = prev;
+        } else {
+            tail = prev;
+        }
+
+        System.out.println("Узел с id " + id + " была удалёна из истории просмотров");
     }
 
-    private void historyViewListCleaner() {
+    private void linkLast(Task task) {
+        Node<Task> newNode = new Node<>(task, head, tail);
 
+        System.out.println(newNode.data);
+        System.out.println(newNode.prev);
+        System.out.println(newNode.next);
+
+        if (tail != null) {
+            tail.next = newNode;
+        } else {
+            head = newNode;
+        }
+
+        tail = newNode;
+        historyMap.put(task.getId(), newNode);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        InMemoryHistoryManager that = (InMemoryHistoryManager) o;
-        return Objects.equals(itemViewHistoryList, that.itemViewHistoryList);
+    private List<Task> getTasks() {
+        List<Task> tasks = new ArrayList<>();
+        Node<Task> current = head;
+
+        while (current != null) {
+            tasks.add(current.data);
+            current = current.next;
+        }
+
+        return tasks;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(itemViewHistoryList);
+    public void removeNode(Task task) {
+        int nodeId = task.getId();
+        remove(nodeId);
     }
+
 }

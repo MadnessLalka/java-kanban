@@ -1,21 +1,18 @@
 package ru.yandex.javacourse.kanban.manager;
 
-public class Node<T> {
-    private int id;
+import ru.yandex.javacourse.kanban.task.Task;
+
+public class Node<T extends Task>{
+    public final int id;
     public final T data;
-    public final Node<T> next;
-    public final Node<T> prev;
+    public Node<T> next;
+    public Node<T> prev;
 
 
-    public Node(T data) {
-        id++;
-        this.data = data;
-        this.next = null;
-        this.prev = null;
+    public Node(T task, Node<T> next, Node<T> prev) {
+        this.id = task.getId();
+        this.data = task;
+        this.next = next;
+        this.prev = prev;
     }
-
-    public Integer getId() {
-        return id;
-    }
-
 }
