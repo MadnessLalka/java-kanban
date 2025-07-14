@@ -59,7 +59,7 @@ public class Main {
         System.out.println(historyManager.getHistory());
         System.out.println();
 
-       /* taskManager.updateTask(new Task("Первая задача", "Описание изменено", firstTask.getId(),
+        taskManager.updateTask(new Task("Первая задача", "Описание изменено", firstTask.getId(),
                 TaskStatus.DONE));
 
         taskManager.updateEpic(new Epic("Название изменено", "sdsd", 2));
@@ -77,6 +77,6 @@ public class Main {
         System.out.println(taskManager.getAllTaskList());
         System.out.println(taskManager.getAllEpicList());
         System.out.println(taskManager.getAllSubTaskList());
-        System.out.println();*/
+        System.out.println();
     }
 }

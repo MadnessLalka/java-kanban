@@ -56,7 +56,7 @@ public class InMemoryHistoryManager implements HistoryManager {
             tail = prev;
         }
 
-        System.out.println("Узел с id " + id + " была удалёна из истории просмотров");
+        System.out.println("Узел с id " + id + " был удалён из истории просмотров");
     }
 
     private void linkLast(Task task) {
@@ -87,17 +87,5 @@ public class InMemoryHistoryManager implements HistoryManager {
     public void removeNode(Task task) {
 
         remove(task.getId());
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        InMemoryHistoryManager that = (InMemoryHistoryManager) o;
-        return Objects.equals(historyMap, that.historyMap);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(historyMap);
     }
 }

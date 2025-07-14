@@ -7,8 +7,7 @@ import ru.yandex.javacourse.kanban.task.Epic;
 import ru.yandex.javacourse.kanban.task.Task;
 import ru.yandex.javacourse.kanban.task.TaskStatus;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class InMemoryHistoryManagerTest {
 
@@ -77,5 +76,34 @@ public class InMemoryHistoryManagerTest {
 
         //then
         assertEquals(realSizeHistory, inMemoryHistoryManager.getHistory().size());
+    }
+
+    @DisplayName("Проверка очерёдности задач при удаление дубликатов")
+    @Test
+    void add_isCorrect_CorrectQueueTasks() {
+        //given
+        int realSizeHistory = 3;
+        Task newTask = new Task("Первая задача", "Описание первой задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW);
+        Epic newEpic = new Epic("Первый эпик", "Описание первого Эпика", inMemoryTaskManager.getNewId());
+        Task newTask2 = new Task("Вторая задача", "Описание второй задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW);
+
+        //when
+        inMemoryHistoryManager.add(newTask);
+        inMemoryHistoryManager.add(newEpic);
+        inMemoryHistoryManager.add(newTask2);
+        inMemoryHistoryManager.add(newTask);
+        inMemoryHistoryManager.add(newEpic);
+        inMemoryHistoryManager.add(newTask);
+
+
+        //then
+        assertEquals(realSizeHistory, inMemoryHistoryManager.getHistory().size());
+        assertSame(inMemoryHistoryManager.getHistory().getFirst(), newTask2);
+        assertSame(inMemoryHistoryManager.getHistory().get(1), newEpic);
+        assertSame(inMemoryHistoryManager.getHistory().getLast(), newTask);
     }
 }
