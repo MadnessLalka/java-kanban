@@ -1,6 +1,8 @@
 package ru.yandex.javacourse.kanban.manager;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import ru.yandex.javacourse.kanban.task.Epic;
 import ru.yandex.javacourse.kanban.task.SubTask;
 import ru.yandex.javacourse.kanban.task.Task;
@@ -10,10 +12,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class InMemoryTaskManagerTest {
     public static InMemoryTaskManager inMemoryTaskManager;
+    public static HistoryManager historyManager;
 
     @BeforeEach
     void beforeEach() {
         inMemoryTaskManager = new InMemoryTaskManager();
+        historyManager = Managers.getDefaultHistory();
     }
 
     @DisplayName("Получение нового ID")
@@ -273,6 +277,117 @@ public class InMemoryTaskManagerTest {
 
         //then
         assertEquals(countSuBTasksAfterRemove, inMemoryTaskManager.getAllSubTaskList().size(), "Должно быть 2 подзадачи");
+    }
+
+    @DisplayName("Проверка синхронного удаление всех задач из истории")
+    @Test
+    void removeAllTask_Clear_AllTasksFromHistory() {
+        //given
+        int countTasks = 3;
+        int countTaskAfterRemove = 0;
+
+        Task newTask1 = new Task("Первая задача", "Описание первой задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW);
+        Task newTask2 = new Task("Вторя задача", "Описание первой задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW);
+        Task newTask3 = new Task("Третья задача", "Описание первой задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW);
+
+        //when
+        inMemoryTaskManager.createTask(newTask1);
+        inMemoryTaskManager.createTask(newTask2);
+        inMemoryTaskManager.createTask(newTask3);
+        historyManager.add(newTask1);
+        historyManager.add(newTask2);
+        historyManager.add(newTask3);
+
+        assertEquals(countTasks, inMemoryTaskManager.getAllTaskList().size(), "Было добавлено 3 задачи");
+
+        inMemoryTaskManager.setHistoryManager(historyManager);
+        assertEquals(countTasks, historyManager.getHistory().size(), "Было добавлено 3 задачи в историю");
+
+        //then
+        inMemoryTaskManager.removeAllTask();
+        assertEquals(countTaskAfterRemove, inMemoryTaskManager.getAllTaskList().size(),
+                "Все задачи должны быть удалены");
+        assertEquals(countTaskAfterRemove, historyManager.getHistory().size(),
+                "Все задачи должны быть удалены из истории");
+    }
+
+    @DisplayName("Проверка синхронного удаление всех эпиков из истории")
+    @Test
+    void removeAllEpic_Clear_AllEpicsFromHistory() {
+        //given
+        int countTasks = 3;
+        int countTaskAfterRemove = 0;
+
+        Epic newEpic1 = new Epic("Первый эпик", "Описание первого Эпика",
+                inMemoryTaskManager.getNewId());
+        Epic newEpic2 = new Epic("Первый эпик", "Описание первого Эпика",
+                inMemoryTaskManager.getNewId());
+        Epic newEpic3 = new Epic("Первый эпик", "Описание первого Эпика",
+                inMemoryTaskManager.getNewId());
+
+        //when
+        inMemoryTaskManager.createEpic(newEpic1);
+        inMemoryTaskManager.createEpic(newEpic2);
+        inMemoryTaskManager.createEpic(newEpic3);
+        historyManager.add(newEpic1);
+        historyManager.add(newEpic2);
+        historyManager.add(newEpic3);
+
+        assertEquals(countTasks, inMemoryTaskManager.getAllEpicList().size(), "Было добавлено 3 эпика");
+
+        inMemoryTaskManager.setHistoryManager(historyManager);
+        assertEquals(countTasks, historyManager.getHistory().size(), "Было добавлено 3 эпика в историю");
+
+        //then
+        inMemoryTaskManager.removeAllEpic();
+        assertEquals(countTaskAfterRemove, inMemoryTaskManager.getAllTaskList().size(),
+                "Все эпики должны быть удалены");
+        assertEquals(countTaskAfterRemove, historyManager.getHistory().size(),
+                "Все эпики должны быть удалены из истории");
+    }
+
+    @DisplayName("Проверка синхронного удаление всех эпиков из истории")
+    @Test
+    void removeAllSubTask_Clear_AllSubTasksFromHistory() {
+        //given
+        int countTasks = 3;
+        int countTaskAfterRemove = 0;
+
+        Epic newEpic1 = new Epic("Первый эпик", "Описание первого Эпика",
+                inMemoryTaskManager.getNewId());
+        SubTask newSubTask1 = new SubTask("Первая подзадача", "Описание первой подзадачи",
+                inMemoryTaskManager.getNewId(), TaskStatus.DONE, newEpic1.getId());
+        SubTask newSubTask2 = new SubTask("Первая подзадача", "Описание первой подзадачи",
+                inMemoryTaskManager.getNewId(), TaskStatus.DONE, newEpic1.getId());
+        SubTask newSubTask3 = new SubTask("Первая подзадача", "Описание первой подзадачи",
+                inMemoryTaskManager.getNewId(), TaskStatus.DONE, newEpic1.getId());
+
+        //when
+        inMemoryTaskManager.createEpic(newEpic1);
+        inMemoryTaskManager.createSubTask(newSubTask1);
+        inMemoryTaskManager.createSubTask(newSubTask2);
+        inMemoryTaskManager.createSubTask(newSubTask3);
+        historyManager.add(newSubTask1);
+        historyManager.add(newSubTask2);
+        historyManager.add(newSubTask3);
+
+        assertEquals(countTasks, inMemoryTaskManager.getAllSubTaskList().size(), "Было добавлено 3 подзадачи");
+
+        inMemoryTaskManager.setHistoryManager(historyManager);
+        assertEquals(countTasks, historyManager.getHistory().size(), "Было добавлено 3 подзадачи в историю");
+
+        //then
+        inMemoryTaskManager.removeAllSubTask();
+        assertEquals(countTaskAfterRemove, inMemoryTaskManager.getAllSubTaskList().size(),
+                "Все подзадачи должны быть удалены");
+        assertEquals(countTaskAfterRemove, historyManager.getHistory().size(),
+                "Все подзадачи должны быть удалены из истории");
     }
 }
 
