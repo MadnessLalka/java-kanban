@@ -32,11 +32,6 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void remove(int id) {
-        if (!historyMap.containsKey(id)) {
-            System.out.println("Задачи с id " + id + " нет в истории просмотров");
-            return;
-        }
-
         Node<Task> node = historyMap.remove(id);
 
         if (node == null) return;
