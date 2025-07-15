@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-class MainTest {
+public class MainTest {
     public static TaskManager taskManager = Managers.getDefault();
     public static HistoryManager historyManager = Managers.getDefaultHistory();
 

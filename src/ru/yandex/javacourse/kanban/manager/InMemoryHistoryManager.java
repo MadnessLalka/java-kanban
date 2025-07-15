@@ -34,6 +34,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     public void remove(int id) {
         Node<Task> node = historyMap.remove(id);
 
+
         if (node == null) return;
 
         Node<Task> prev = node.prev;
