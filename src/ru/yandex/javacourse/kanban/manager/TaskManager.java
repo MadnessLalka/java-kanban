@@ -47,6 +47,8 @@ public interface TaskManager {
 
     void removeSubTaskById(Integer subTaskId);
 
+    void setHistoryManager(HistoryManager historyManager);
+
     ArrayList<SubTask> getAllSubTaskByEpic(Task epic);
 
     @Override
