@@ -1,8 +1,6 @@
 package ru.yandex.javacourse.kanban;
 
-import ru.yandex.javacourse.kanban.manager.HistoryManager;
-import ru.yandex.javacourse.kanban.manager.Managers;
-import ru.yandex.javacourse.kanban.manager.TaskManager;
+import ru.yandex.javacourse.kanban.manager.*;
 import ru.yandex.javacourse.kanban.task.Epic;
 import ru.yandex.javacourse.kanban.task.SubTask;
 import ru.yandex.javacourse.kanban.task.Task;
@@ -33,48 +31,42 @@ public class Main {
         taskManager.createSubTask(firstSubTask);
         taskManager.createSubTask(secondSubTask);
 
-        Epic secondEpic = new Epic("Второй эпик", "Описание второго Эпика", taskManager.getNewId());
-        taskManager.createEpic(secondEpic);
-
-        SubTask thirdSubTask = new SubTask("Первая подзадача", "Описание первой подзадачи второго эпика",
-                taskManager.getNewId(), TaskStatus.NEW, secondEpic.getId());
+        SubTask thirdSubTask = new SubTask("Третья подзадача", "Описание третий подзадачи первого эпика",
+                taskManager.getNewId(), TaskStatus.NEW, firstEpic.getId());
 
         taskManager.createSubTask(thirdSubTask);
 
-        System.out.println(taskManager.getAllTaskList());
-        System.out.println(taskManager.getAllEpicList());
-        System.out.println(taskManager.getAllSubTaskList());
-        System.out.println();
+        Epic secondEpic = new Epic("Второй эпик", "Описание второго Эпика", taskManager.getNewId());
+        taskManager.createEpic(secondEpic);
 
-        historyManager.add(taskManager.getTaskById(firstTask.getId()));
-        historyManager.add(taskManager.getTaskById(firstTask.getId()));
-        historyManager.add(taskManager.getEpicById(firstEpic.getId()));
+        taskManager.setHistoryManager(historyManager);
+
+        historyManager.add(firstTask);
+        historyManager.add(firstTask);
+        historyManager.add(secondTask);
+        historyManager.add(firstEpic);
+        historyManager.add(firstTask);
+        historyManager.add(secondTask);
+        historyManager.add(firstTask);
+        historyManager.add(firstEpic);
+        historyManager.add(secondEpic);
+        historyManager.add(firstEpic);
 
         System.out.println("История просмотров");
         System.out.println(historyManager.getHistory());
         System.out.println();
 
-
-        taskManager.updateTask(new Task("Первая задача", "Описание изменено", firstTask.getId(),
-                TaskStatus.DONE));
-
-        taskManager.updateEpic(new Epic("Название изменено", "sdsd", 2));
-        taskManager.updateSubTask(new SubTask("Первая подзадача изменена", "Описание первой подзадачи новое",
-                firstSubTask.getId(), TaskStatus.DONE, firstEpic.getId()));
-
-        System.out.println(taskManager.getAllTaskList());
-        System.out.println(taskManager.getAllEpicList());
-        System.out.println(taskManager.getAllSubTaskList());
-        System.out.println();
-
         taskManager.removeTaskById(firstTask.getId());
         taskManager.removeEpicById(firstEpic.getId());
 
+        System.out.println();
+        System.out.println("История просмотров");
+        System.out.println(historyManager.getHistory());
+        System.out.println();
+
         System.out.println(taskManager.getAllTaskList());
         System.out.println(taskManager.getAllEpicList());
         System.out.println(taskManager.getAllSubTaskList());
         System.out.println();
-
-
     }
 }

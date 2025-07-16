@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-class MainTest {
+public class MainTest {
     public static TaskManager taskManager = Managers.getDefault();
     public static HistoryManager historyManager = Managers.getDefaultHistory();
 
@@ -64,9 +64,9 @@ class MainTest {
     }
 
 
-    @DisplayName("Проверка размерности истории просмотров")
+    @DisplayName("Проверка удаления одинаковых подзадач")
     @Test
-    void historyManager_Saved_TenItems() {
+    void historyManager_Removed_EqualTasks() {
         //given
         Task firstTask = taskManager.getTaskById(0);
         Task secondTask = taskManager.getTaskById(4);
@@ -87,7 +87,7 @@ class MainTest {
         historyManager.add(secondTask);
 
         //then
-        assertEquals(10, historyManager.getHistory().size(), "Больше чем 10 :" +
+        assertEquals(3, historyManager.getHistory().size(), "Больше чем 3 :" +
                 historyManager.getHistory().size());
 
     }
@@ -295,7 +295,7 @@ class MainTest {
         assertEquals(epicId, currentSubTask.getEpicId());
     }
 
-    @DisplayName("Сохранение прошлых версий задач в историю")
+    @DisplayName("Удаление прошлой версии задачи из истории после обновления")
     @Test
     void historyManager_Saved_PastVersionTask() {
         //given
@@ -314,11 +314,10 @@ class MainTest {
         System.out.println(testedTasksList);
 
         //then
-        assertEquals(historyManager.getHistory().getFirst(), testTask);
-        assertEquals(testedTasksList, historyManager.getHistory());
+        assertEquals(historyManager.getHistory().getFirst(), updatedTask);
     }
 
-    @DisplayName("Сохранение прошлых версий эпиков в историю")
+    @DisplayName("Удаление прошлой версии эпика из истории после обновления")
     @Test
     void historyManager_Saved_PastVersionEpic() {
         //given
@@ -337,13 +336,12 @@ class MainTest {
         System.out.println(testedEpicList);
 
         //then
-        assertEquals(historyManager.getHistory().getFirst(), testEpic);
-        assertEquals(testedEpicList, historyManager.getHistory());
+        assertEquals(historyManager.getHistory().getFirst(), updatedEpic);
     }
 
-    @DisplayName("Сохранение прошлых версий подзадач в историю")
+    @DisplayName("Удаление прошлой версий подзадачи в истории после обновления")
     @Test
-    void historyManager_Saved_PastVersionSubTask() {
+    void historyManager_Removed_PastVersionSubTask() {
         //given
         int subTaskId = 2;
         int epicId = 1;
@@ -361,7 +359,6 @@ class MainTest {
         System.out.println(testedSubTaskList);
 
         //then
-        assertEquals(historyManager.getHistory().getFirst(), testSubTask);
-        assertEquals(testedSubTaskList, historyManager.getHistory());
+        assertEquals(historyManager.getHistory().getFirst(), updatedSubTask);
     }
 }
