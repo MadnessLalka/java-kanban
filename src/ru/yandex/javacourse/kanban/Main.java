@@ -6,9 +6,11 @@ import ru.yandex.javacourse.kanban.task.SubTask;
 import ru.yandex.javacourse.kanban.task.Task;
 import ru.yandex.javacourse.kanban.task.TaskStatus;
 
+import java.io.IOException;
+
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         TaskManager taskManager = Managers.getDefault();
         HistoryManager historyManager = Managers.getDefaultHistory();
 
@@ -68,5 +70,11 @@ public class Main {
         System.out.println(taskManager.getAllEpicList());
         System.out.println(taskManager.getAllSubTaskList());
         System.out.println();
+
+        FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager();
+
+        fileBackedTaskManager.createTask(firstTask);
+
+
     }
 }

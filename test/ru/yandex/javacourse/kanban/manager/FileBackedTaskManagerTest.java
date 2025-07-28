@@ -34,7 +34,7 @@ public class FileBackedTaskManagerTest {
         String taskToString = fileBackedTaskManager.toString(newTask);
 
         //then
-        assertEquals(("0, TASK, Первая задача, NEW, Описание первой задачи"), taskToString,
+        assertEquals(("0,TASK,Первая задача,NEW,Описание первой задачи"), taskToString,
                 "Текстовое описание должно быть эквивалентно");
     }
 
@@ -49,7 +49,7 @@ public class FileBackedTaskManagerTest {
         String epicToString = fileBackedTaskManager.toString(newEpic);
 
         //then
-        assertEquals(("0, EPIC, Первый эпик, NEW, Описание первого Эпика"), epicToString,
+        assertEquals(("0,EPIC,Первый эпик,NEW,Описание первого Эпика"), epicToString,
                 "Текстовое описание должно быть эквивалентно");
     }
 
@@ -66,9 +66,55 @@ public class FileBackedTaskManagerTest {
         String subTaskToString = fileBackedTaskManager.toString(newSubTask);
 
         //then
-        assertEquals(("1, SUBTASK, Вторая подзадача, IN_PROGRESS, Описание второй подзадачи, 0"), subTaskToString ,
+        assertEquals(("1,SUBTASK,Вторая подзадача,IN_PROGRESS,Описание второй подзадачи,0"), subTaskToString,
                 "Текстовое описание должно быть эквивалентно");
     }
 
+    @DisplayName("Проверка получения задачи из текстового поле")
+    @Test
+    void get_Get_TaskFromStringLine() throws InvalidTaskTypeException {
+        //given
+        Task newTask = new Task("Первая задача", "Описание первой задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW);
 
+        //when
+        String taskToString = fileBackedTaskManager.toString(newTask);
+        Task restoredTask = fileBackedTaskManager.fromString(taskToString);
+
+        //then
+        assertEquals(restoredTask, newTask, "Задачи должны быть эквиваленты");
+    }
+
+    @DisplayName("Проверка получения эпика из текстового поле")
+    @Test
+    void get_Get_EpicFromStringLine() throws InvalidTaskTypeException {
+        //given
+        Epic newEpic = new Epic("Первый эпик", "Описание первого Эпика",
+                inMemoryTaskManager.getNewId());
+
+        //when
+        String epicToString = fileBackedTaskManager.toString(newEpic);
+        Epic restoredEpic = (Epic) fileBackedTaskManager.fromString(epicToString);
+
+        //then
+        assertEquals(restoredEpic, newEpic, "Эпики должны быть эквиваленты");
+    }
+
+    @DisplayName("Проверка получения подзадачи из текстового поле")
+    @Test
+    void get_Get_SubTaskFromStringLine() throws InvalidTaskTypeException {
+        //given
+        Epic newEpic = new Epic("Первый эпик", "Описание первого Эпика",
+                inMemoryTaskManager.getNewId());
+        SubTask newSubTask = new SubTask("Вторая подзадача", "Описание второй подзадачи",
+                inMemoryTaskManager.getNewId(), TaskStatus.IN_PROGRESS, newEpic.getId());
+
+        //when
+        String subTaskToString = fileBackedTaskManager.toString(newSubTask);
+        SubTask restoredSubTask = (SubTask) fileBackedTaskManager.fromString(subTaskToString);
+
+        //then
+        assertEquals(restoredSubTask, newSubTask, "Подзадачи должны быть эквиваленты");
+    }
 }

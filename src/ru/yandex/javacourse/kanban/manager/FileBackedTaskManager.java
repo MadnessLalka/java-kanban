@@ -12,24 +12,36 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 
 import static ru.yandex.javacourse.kanban.manager.TaskType.*;
 
 public class FileBackedTaskManager extends InMemoryTaskManager implements TaskManager {
-
-    Path taskManagerMemoryFile = null;
+    final Path path = Paths.get("taskManagerMemory.csv");
 
     public FileBackedTaskManager() throws IOException {
-        Path path = Paths.get("taskManagerMemory.csv");
-        if (!Files.exists(path)){
-            taskManagerMemoryFile = Files.createFile(path);
-            try (Writer fileWriter = new FileWriter(path.toFile(),true)){
+        if (!Files.exists(path)) {
+           Files.createFile(path);
+            try (Writer fileWriter = new FileWriter(path.toFile(), true)) {
                 fileWriter.write("id,type,name,status,description,epic");
             }
         }
     }
 
-    private void save(){
+    private void save() {
+        ArrayList<Task> allTasksList = new ArrayList<>();
+        allTasksList.addAll(getAllTaskList());
+        allTasksList.addAll(getAllEpicList());
+        allTasksList.addAll(getAllSubTaskList());
+
+        for (Task t : allTasksList){
+            try (Writer writer = ) {
+                fileWriter.write(toString(t));
+            } catch (IOException | InvalidTaskTypeException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
 
     }
 
@@ -168,40 +180,40 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     public String toString(Task task) throws InvalidTaskTypeException {
         StringBuilder builder = new StringBuilder();
 
-        switch (task.getClass().getSimpleName().toUpperCase()){
+        switch (task.getClass().getSimpleName().toUpperCase()) {
             case "TASK" -> builder.append(task.getId())
-                    .append(", ")
+                    .append(",")
                     .append(TASK)
-                    .append(", ")
+                    .append(",")
                     .append(task.getName())
-                    .append(", ")
+                    .append(",")
                     .append(task.getStatus())
-                    .append(", ")
+                    .append(",")
                     .append(task.getDescription());
             case "EPIC" -> {
                 Epic epic = (Epic) task;
                 builder.append(epic.getId())
-                        .append(", ")
+                        .append(",")
                         .append(EPIC)
-                        .append(", ")
+                        .append(",")
                         .append(epic.getName())
-                        .append(", ")
+                        .append(",")
                         .append(epic.getStatus())
-                        .append(", ")
+                        .append(",")
                         .append(epic.getDescription());
             }
             case "SUBTASK" -> {
                 SubTask subTask = (SubTask) task;
                 builder.append(subTask.getId())
-                        .append(", ")
+                        .append(",")
                         .append(SUBTASK)
-                        .append(", ")
+                        .append(",")
                         .append(subTask.getName())
-                        .append(", ")
+                        .append(",")
                         .append(subTask.getStatus())
-                        .append(", ")
+                        .append(",")
                         .append(subTask.getDescription())
-                        .append(", ")
+                        .append(",")
                         .append(subTask.getEpicId());
 
             }
@@ -209,5 +221,30 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         }
 
         return builder.toString();
+    }
+
+    public Task fromString(String value) throws InvalidTaskTypeException {
+        List<String> tempStringTaskList = new ArrayList<>(List.of(value.split(",")));
+
+        String name = tempStringTaskList.get(2);
+        String description = tempStringTaskList.get(4);
+        int id = Integer.parseInt(tempStringTaskList.get(0));
+
+        switch (tempStringTaskList.get(1)) {
+            case "TASK" -> {
+                TaskStatus status = TaskStatus.valueOf(tempStringTaskList.get(3));
+                return new Task(name, description, id, status);
+            }
+            case "EPIC" -> {
+                return new Epic(name, description, id);
+            }
+            case "SUBTASK" -> {
+                TaskStatus status = TaskStatus.valueOf(tempStringTaskList.get(3));
+                int epicId = Integer.parseInt(tempStringTaskList.get(5));
+                return new SubTask(name, description, id, status, epicId);
+            }
+            default -> throw new InvalidTaskTypeException("Такова типа задач нет!");
+        }
+
     }
 }
