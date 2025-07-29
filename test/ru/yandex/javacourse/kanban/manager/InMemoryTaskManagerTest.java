@@ -186,7 +186,7 @@ public class InMemoryTaskManagerTest {
 
     @DisplayName("Удаление подзадач если удалить эпик")
     @Test
-    void removeEpicById_Remove_AllSubTaskByEpic(){
+    void removeEpicById_Remove_AllSubTaskByEpic() {
         //given
         int countSubTasks = 3;
         int countEpics = 1;
@@ -221,7 +221,7 @@ public class InMemoryTaskManagerTest {
 
     @DisplayName("Удаление задачи по id")
     @Test
-    void removeTaskById_Remove_TaskById(){
+    void removeTaskById_Remove_TaskById() {
         //given
         int countTasks = 3;
         int countTaskAfterRemove = 2;
@@ -249,7 +249,7 @@ public class InMemoryTaskManagerTest {
 
     @DisplayName("Удаление подзадачи по id")
     @Test
-    void removeSubTaskById_Remove_SubTaskById(){
+    void removeSubTaskById_Remove_SubTaskById() {
         //given
         int countSubTasks = 3;
         int countEpics = 1;

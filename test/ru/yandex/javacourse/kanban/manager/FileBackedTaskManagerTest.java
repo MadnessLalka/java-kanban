@@ -1,5 +1,6 @@
 package ru.yandex.javacourse.kanban.manager;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -8,18 +9,31 @@ import ru.yandex.javacourse.kanban.task.SubTask;
 import ru.yandex.javacourse.kanban.task.Task;
 import ru.yandex.javacourse.kanban.task.TaskStatus;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
+import java.nio.file.Files;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
+import static ru.yandex.javacourse.kanban.manager.Stubs.FILE_HEADER;
 
 public class FileBackedTaskManagerTest {
     public static FileBackedTaskManager fileBackedTaskManager;
     public static InMemoryTaskManager inMemoryTaskManager;
+    public static File tempFile;
 
     @BeforeEach
     void beforeEach() throws IOException {
-        fileBackedTaskManager = new FileBackedTaskManager();
+        tempFile = File.createTempFile("TempFileMem", ".csv");
+        fileBackedTaskManager = new FileBackedTaskManager(tempFile.toPath());
         inMemoryTaskManager = new InMemoryTaskManager();
+
+    }
+
+    @AfterEach
+    void afterEach() {
+        tempFile.deleteOnExit();
     }
 
     @DisplayName("Проверка вывода задачи из объекта в текстовое поле")
@@ -80,7 +94,7 @@ public class FileBackedTaskManagerTest {
 
         //when
         String taskToString = fileBackedTaskManager.toString(newTask);
-        Task restoredTask = fileBackedTaskManager.fromString(taskToString);
+        Task restoredTask = FileBackedTaskManager.fromString(taskToString);
 
         //then
         assertEquals(restoredTask, newTask, "Задачи должны быть эквиваленты");
@@ -95,7 +109,7 @@ public class FileBackedTaskManagerTest {
 
         //when
         String epicToString = fileBackedTaskManager.toString(newEpic);
-        Epic restoredEpic = (Epic) fileBackedTaskManager.fromString(epicToString);
+        Epic restoredEpic = (Epic) FileBackedTaskManager.fromString(epicToString);
 
         //then
         assertEquals(restoredEpic, newEpic, "Эпики должны быть эквиваленты");
@@ -112,9 +126,96 @@ public class FileBackedTaskManagerTest {
 
         //when
         String subTaskToString = fileBackedTaskManager.toString(newSubTask);
-        SubTask restoredSubTask = (SubTask) fileBackedTaskManager.fromString(subTaskToString);
+        SubTask restoredSubTask = (SubTask) FileBackedTaskManager.fromString(subTaskToString);
 
         //then
         assertEquals(restoredSubTask, newSubTask, "Подзадачи должны быть эквиваленты");
+    }
+
+    @DisplayName("Проверка сохранения пустого файл")
+    @Test
+    void add_isSaved_EmptyFileToDisk() throws IOException {
+        //given
+        String fileHeader = "id,type,name,status,description,epic";
+
+        //when
+        fileBackedTaskManager.save();
+
+        //then
+        assertEquals(fileHeader, Files.readString(tempFile.toPath()).trim(),
+                "Количество символов должно быть одинаковое");
+    }
+
+    @DisplayName("Проверка загрузки пустого файл")
+    @Test
+    void add_isImport_EmptyFileToMemory() {
+        //when
+        Exception exception = assertThrows(NullPointerException.class, () -> {
+            FileBackedTaskManager.loadFromFile(tempFile);
+        });
+
+        //then
+        assertTrue("Файл пуст".contains(exception.getMessage()), "Должно появится исключение `Файл пуст`");
+    }
+
+    @DisplayName("Проверка сохранения задач в файл")
+    @Test
+    void add_isSave_TasksObjectToFileMemory() throws IOException, InvalidTaskTypeException {
+        //given
+        Task newTask = new Task("Первая задача", "Описание первой задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW);
+        Epic newEpic = new Epic("Первый эпик", "Описание первого Эпика",
+                inMemoryTaskManager.getNewId());
+        SubTask newSubTask = new SubTask("Вторая подзадача", "Описание второй подзадачи",
+                inMemoryTaskManager.getNewId(), TaskStatus.IN_PROGRESS, newEpic.getId());
+
+        //when
+        fileBackedTaskManager.createTask(newTask);
+        fileBackedTaskManager.createEpic(newEpic);
+        fileBackedTaskManager.createSubTask(newSubTask);
+
+        String tasksLine = FILE_HEADER + "\n" +
+                fileBackedTaskManager.toString(newTask) + "\n" +
+                fileBackedTaskManager.toString(newEpic) + "\n" +
+                fileBackedTaskManager.toString(newSubTask) + "\n";
+
+        String memory = Files.readString(tempFile.toPath());
+
+        //then
+        assertEquals(tasksLine, memory,
+                "Строки должны быть эквивалентны");
+    }
+
+    @DisplayName("Проверка загрузки задач в память")
+    @Test
+    void add_isImport_FromStringToMemory() throws IOException, InvalidTaskTypeException {
+        //given
+        Task newTask = new Task("Первая задача", "Описание первой задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW);
+        Epic newEpic = new Epic("Первый эпик", "Описание первого Эпика",
+                inMemoryTaskManager.getNewId());
+        SubTask newSubTask = new SubTask("Вторая подзадача", "Описание второй подзадачи",
+                inMemoryTaskManager.getNewId(), TaskStatus.IN_PROGRESS, newEpic.getId());
+
+        Writer fileWriter = new FileWriter(tempFile, true);
+        fileWriter.write(FILE_HEADER + "\n");
+        fileWriter.write(fileBackedTaskManager.toString(newTask) + "\n");
+        fileWriter.write(fileBackedTaskManager.toString(newEpic) + "\n");
+        fileWriter.write(fileBackedTaskManager.toString(newSubTask) + "\n");
+
+        fileWriter.close();
+        //when
+        System.out.println(Files.readString(tempFile.toPath()));
+        inMemoryTaskManager = FileBackedTaskManager.loadFromFile(tempFile);
+
+        //then
+        assertEquals(newTask, inMemoryTaskManager.getTaskById(0),
+                "Заявки должны быть эквивалентны");
+        assertEquals(newEpic, inMemoryTaskManager.getEpicById(1),
+                "Эпики должны быть эквивалентны");
+        assertEquals(newSubTask, inMemoryTaskManager.getSubTaskById(2),
+                "Подзадачи должны быть эквивалентны");
     }
 }

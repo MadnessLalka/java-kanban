@@ -198,7 +198,7 @@ public class MainTest {
     void taskManager_Create_EpicWithEqualId() {
         //given
         int idEqualEpic = 8;
-        Epic firstEqualEpic= new Epic("Тестовая1", "Тест1", idEqualEpic);
+        Epic firstEqualEpic = new Epic("Тестовая1", "Тест1", idEqualEpic);
         Epic secondEqualEpic = new Epic("Тестовая2", "Тест2", idEqualEpic);
 
         //when
@@ -216,8 +216,8 @@ public class MainTest {
         //given
         int idEqualSubTask = 8;
         int idEpic = 1;
-        SubTask firstEqualSubTask= new SubTask("Тестовая1", "Тест1", idEqualSubTask, TaskStatus.NEW, idEpic);
-        SubTask secondEqualSubTask= new SubTask("Тестовая2", "Тест2", idEqualSubTask, TaskStatus.NEW, idEpic);
+        SubTask firstEqualSubTask = new SubTask("Тестовая1", "Тест1", idEqualSubTask, TaskStatus.NEW, idEpic);
+        SubTask secondEqualSubTask = new SubTask("Тестовая2", "Тест2", idEqualSubTask, TaskStatus.NEW, idEpic);
 
         //when
         taskManager.createSubTask(firstEqualSubTask);
@@ -230,7 +230,7 @@ public class MainTest {
 
     @DisplayName("Проверка обновления задач")
     @Test
-    void taskManager_Update_Task(){
+    void taskManager_Update_Task() {
         //given
         int taskId = 7;
         Task testTask = new Task("Тестовая1", "Тест1", taskId,
@@ -254,7 +254,7 @@ public class MainTest {
 
     @DisplayName("Проверка обновления эпиков")
     @Test
-    void taskManager_Update_Epic(){
+    void taskManager_Update_Epic() {
         //given
         int epicId = 7;
         Epic testEpic = new Epic("Тестовая1", "Тест1", epicId);
@@ -274,7 +274,7 @@ public class MainTest {
 
     @DisplayName("Проверка обновления подзадач")
     @Test
-    void taskManager_Update_SubTask(){
+    void taskManager_Update_SubTask() {
         //given
         int subTaskId = 7;
         int epicId = 1;
