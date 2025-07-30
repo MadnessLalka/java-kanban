@@ -11,13 +11,13 @@ public class EpicTest {
     public static InMemoryTaskManager inMemoryTaskManager;
 
     @BeforeEach
-    void beforeEach(){
+    void beforeEach() {
         inMemoryTaskManager = new InMemoryTaskManager();
     }
 
     @DisplayName("Проверка статуса эпика без подзадач")
     @Test
-    void setStatus_StatusChange_NewEpic(){
+    void setStatus_StatusChange_NewEpic() {
         //given
         Epic newEpic = new Epic("Первый эпик", "Описание первого Эпика",
                 inMemoryTaskManager.getNewId());
@@ -32,7 +32,7 @@ public class EpicTest {
 
     @DisplayName("Статус эпика если подзадача выполняется")
     @Test
-    void setStatus_StatusChange_WhenSubTaskToProgress(){
+    void setStatus_StatusChange_WhenSubTaskToProgress() {
         //given
         Epic newEpic = new Epic("Первый эпик", "Описание первого Эпика",
                 inMemoryTaskManager.getNewId());
@@ -51,7 +51,7 @@ public class EpicTest {
 
     @DisplayName("Статус эпика если подзадача выполнена")
     @Test
-    void setStatus_StatusChange_WhenSubTaskToDone(){
+    void setStatus_StatusChange_WhenSubTaskToDone() {
         //given
         Epic newEpic = new Epic("Первый эпик", "Описание первого Эпика",
                 inMemoryTaskManager.getNewId());
@@ -69,7 +69,7 @@ public class EpicTest {
 
     @DisplayName("Статус эпика если удалить подзадачу")
     @Test
-    void setStatus_StatusChange_WhenSubTaskRemove(){
+    void setStatus_StatusChange_WhenSubTaskRemove() {
         //given
         Epic newEpic = new Epic("Первый эпик", "Описание первого Эпика",
                 inMemoryTaskManager.getNewId());
