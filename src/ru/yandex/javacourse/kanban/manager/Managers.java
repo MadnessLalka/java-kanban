@@ -1,12 +1,15 @@
 package ru.yandex.javacourse.kanban.manager;
 
+import java.nio.file.Path;
+
 public class Managers {
 
     private Managers() {
     }
 
     public static TaskManager getDefault() {
-        return new InMemoryTaskManager();
+        Path path = Path.of("taskManagerMemory.csv");
+        return FileBackedTaskManager.loadFromFile(path.toFile());
     }
 
     public static HistoryManager getDefaultHistory() {

@@ -1,4 +1,4 @@
-package ru.yandex.javacourse.kanban.manager;
+package ru.yandex.javacourse.kanban.manager.exception;
 
 public class InvalidTaskTypeException extends Exception {
     public InvalidTaskTypeException(String message) {

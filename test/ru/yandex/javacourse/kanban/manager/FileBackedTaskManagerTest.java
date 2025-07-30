@@ -4,6 +4,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import ru.yandex.javacourse.kanban.manager.exception.InvalidTaskTypeException;
 import ru.yandex.javacourse.kanban.task.Epic;
 import ru.yandex.javacourse.kanban.task.SubTask;
 import ru.yandex.javacourse.kanban.task.Task;
@@ -187,9 +188,9 @@ public class FileBackedTaskManagerTest {
                 "Строки должны быть эквивалентны");
     }
 
-    @DisplayName("Проверка загрузки задач в память")
+    @DisplayName("Проверка загрузки задач в при перезапуске программы")
     @Test
-    void add_isImport_FromStringToMemory() throws IOException, InvalidTaskTypeException {
+    void add_isImport_FromStringToProgram() throws IOException, InvalidTaskTypeException {
         //given
         Task newTask = new Task("Первая задача", "Описание первой задачи",
                 inMemoryTaskManager.getNewId(),
@@ -204,18 +205,18 @@ public class FileBackedTaskManagerTest {
         fileWriter.write(fileBackedTaskManager.toString(newTask) + "\n");
         fileWriter.write(fileBackedTaskManager.toString(newEpic) + "\n");
         fileWriter.write(fileBackedTaskManager.toString(newSubTask) + "\n");
-
         fileWriter.close();
+
         //when
         System.out.println(Files.readString(tempFile.toPath()));
-        inMemoryTaskManager = FileBackedTaskManager.loadFromFile(tempFile);
+        FileBackedTaskManager fileBackedTaskManager1 = FileBackedTaskManager.loadFromFile(tempFile);
 
         //then
-        assertEquals(newTask, inMemoryTaskManager.getTaskById(0),
+        assertEquals(newTask, fileBackedTaskManager1.getTaskById(0),
                 "Заявки должны быть эквивалентны");
-        assertEquals(newEpic, inMemoryTaskManager.getEpicById(1),
+        assertEquals(newEpic, fileBackedTaskManager1.getEpicById(1),
                 "Эпики должны быть эквивалентны");
-        assertEquals(newSubTask, inMemoryTaskManager.getSubTaskById(2),
+        assertEquals(newSubTask, fileBackedTaskManager1.getSubTaskById(2),
                 "Подзадачи должны быть эквивалентны");
     }
 }

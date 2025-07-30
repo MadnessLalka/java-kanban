@@ -1,5 +1,7 @@
 package ru.yandex.javacourse.kanban.manager;
 
+import ru.yandex.javacourse.kanban.manager.exception.InvalidTaskTypeException;
+import ru.yandex.javacourse.kanban.manager.exception.ManagerSaveException;
 import ru.yandex.javacourse.kanban.task.Epic;
 import ru.yandex.javacourse.kanban.task.SubTask;
 import ru.yandex.javacourse.kanban.task.Task;
@@ -14,20 +16,29 @@ import java.util.List;
 import static ru.yandex.javacourse.kanban.manager.TaskType.*;
 
 public class FileBackedTaskManager extends InMemoryTaskManager implements TaskManager {
-    static InMemoryTaskManager inMemoryTaskManager = new InMemoryTaskManager();
-    final Path path;
+    private final Path path;
 
-    public FileBackedTaskManager(Path path) throws IOException {
+    public FileBackedTaskManager(Path path) throws ManagerSaveException {
         this.path = path;
 
-        if (!Files.exists(path)) {
-            Files.createFile(path);
+        try {
+            if (!Files.exists(path)) {
+                Files.createFile(path);
+            }
+        } catch (IOException e) {
+            throw new ManagerSaveException("Не удалось создать файл для сохранения", e);
         }
+
     }
 
-    static InMemoryTaskManager loadFromFile(File file) throws IOException {
-        if (Files.readString(file.toPath()).isBlank()) throw new NullPointerException("Файл пуст");
+    static FileBackedTaskManager loadFromFile(File file) throws ManagerSaveException {
+        try {
+            if (Files.readString(file.toPath()).isBlank()) throw new NullPointerException("Файл пуст");
+        } catch (IOException e) {
+            throw new ManagerSaveException("Не удалось создать файл для сохранения", e);
+        }
 
+        FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file.toPath());
         try (Reader fileReader = new FileReader(file)) {
 
             BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -36,22 +47,21 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                 if (line.contains("id,type,name,status,description,epic")) continue;
 
                 if (line.contains("TASK") && !line.contains("SUBTASK")) {
-                    inMemoryTaskManager.createTask(fromString(line));
+                    fileBackedTaskManager.createTask(fromString(line));
                 } else if (line.contains("EPIC")) {
-                    inMemoryTaskManager.createEpic((Epic) fromString(line));
+                    fileBackedTaskManager.createEpic((Epic) fromString(line));
                 } else if (line.contains("SUBTASK")) {
-                    inMemoryTaskManager.createSubTask((SubTask) fromString(line));
+                    fileBackedTaskManager.createSubTask((SubTask) fromString(line));
                 }
-
             }
         } catch (FileNotFoundException e) {
-            throw new FileNotFoundException("Файл не найден");
+            throw new ManagerSaveException("Файл не найден", e);
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка при попытке чтения из файла", e);
         } catch (InvalidTaskTypeException e) {
             System.out.println(e.getMessage());
         }
-        return inMemoryTaskManager;
+        return fileBackedTaskManager;
     }
 
 
