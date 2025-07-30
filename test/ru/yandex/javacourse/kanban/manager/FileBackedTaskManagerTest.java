@@ -153,14 +153,10 @@ public class FileBackedTaskManagerTest {
         //when
 
         FileBackedTaskManager.loadFromFile(tempFile);
-
         String memory = Files.readString(tempFile.toPath());
-//        Exception exception = assertThrows(NullPointerException.class, () -> {
-//            FileBackedTaskManager.loadFromFile(tempFile);
-//        });
 
         //then
-        assertEquals(FILE_HEADER+"\n", memory, "В файле должен появится заголовок");
+        assertEquals(FILE_HEADER + "\n", memory, "В файле должен появится заголовок");
     }
 
     @DisplayName("Проверка сохранения задач в файл")
