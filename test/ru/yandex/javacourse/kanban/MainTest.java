@@ -42,7 +42,7 @@ public class MainTest {
 
     @AfterEach
     void afterEach() {
-        taskManager = Managers.getDefault();
+        taskManager = new InMemoryTaskManager();
         historyManager = Managers.getDefaultHistory();
     }
 
@@ -130,7 +130,7 @@ public class MainTest {
     @Test
     void taskManager_Compare_EqualsTaskManagers() {
         //given
-        TaskManager taskManager = Managers.getDefault();
+        TaskManager taskManager = new InMemoryTaskManager();
 
         //then
         assertEquals(taskManager, taskManager, "Менеджеры задач должен быть эквивалентны");
@@ -155,6 +155,9 @@ public class MainTest {
         int countAllSubTask = taskManager.getAllSubTaskList().size();
 
         //then
+        System.out.println("=======");
+        System.out.println(taskManager.getAllTaskList());
+
         assertEquals(2, countAllTasks);
         assertEquals(1, countAllEpics);
         assertEquals(2, countAllSubTask);

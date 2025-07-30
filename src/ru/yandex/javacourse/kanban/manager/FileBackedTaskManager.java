@@ -1,6 +1,7 @@
 package ru.yandex.javacourse.kanban.manager;
 
 import ru.yandex.javacourse.kanban.manager.exception.InvalidTaskTypeException;
+import ru.yandex.javacourse.kanban.manager.exception.ManagerReadException;
 import ru.yandex.javacourse.kanban.manager.exception.ManagerSaveException;
 import ru.yandex.javacourse.kanban.task.Epic;
 import ru.yandex.javacourse.kanban.task.SubTask;
@@ -28,17 +29,20 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         } catch (IOException e) {
             throw new ManagerSaveException("Не удалось создать файл для сохранения", e);
         }
-
     }
 
     static FileBackedTaskManager loadFromFile(File file) throws ManagerSaveException {
+        FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file.toPath());
+
         try {
-            if (Files.readString(file.toPath()).isBlank()) throw new NullPointerException("Файл пуст");
+            if (Files.readString(file.toPath()).isBlank()) {
+                System.out.println("Формируем новый файл");
+                fileBackedTaskManager.save();
+            }
         } catch (IOException e) {
-            throw new ManagerSaveException("Не удалось создать файл для сохранения", e);
+            throw new ManagerReadException("Ошибка при попытке чтения из файла", e);
         }
 
-        FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file.toPath());
         try (Reader fileReader = new FileReader(file)) {
 
             BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -57,13 +61,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         } catch (FileNotFoundException e) {
             throw new ManagerSaveException("Файл не найден", e);
         } catch (IOException e) {
-            throw new ManagerSaveException("Ошибка при попытке чтения из файла", e);
+            throw new ManagerReadException("Ошибка при попытке чтения из файла", e);
         } catch (InvalidTaskTypeException e) {
             System.out.println(e.getMessage());
         }
         return fileBackedTaskManager;
     }
-
 
     protected void save() {
         ArrayList<Task> allTasksList = new ArrayList<>();
@@ -284,6 +287,5 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             }
             default -> throw new InvalidTaskTypeException("Такова типа задач нет!");
         }
-
     }
 }

@@ -149,14 +149,18 @@ public class FileBackedTaskManagerTest {
 
     @DisplayName("Проверка загрузки пустого файл")
     @Test
-    void add_isImport_EmptyFileToMemory() {
+    void add_isImport_EmptyFileToMemory() throws IOException {
         //when
-        Exception exception = assertThrows(NullPointerException.class, () -> {
-            FileBackedTaskManager.loadFromFile(tempFile);
-        });
+
+        FileBackedTaskManager.loadFromFile(tempFile);
+
+        String memory = Files.readString(tempFile.toPath());
+//        Exception exception = assertThrows(NullPointerException.class, () -> {
+//            FileBackedTaskManager.loadFromFile(tempFile);
+//        });
 
         //then
-        assertTrue("Файл пуст".contains(exception.getMessage()), "Должно появится исключение `Файл пуст`");
+        assertEquals(FILE_HEADER+"\n", memory, "В файле должен появится заголовок");
     }
 
     @DisplayName("Проверка сохранения задач в файл")
@@ -208,7 +212,7 @@ public class FileBackedTaskManagerTest {
         fileWriter.close();
 
         //when
-        System.out.println(Files.readString(tempFile.toPath()));
+
         FileBackedTaskManager fileBackedTaskManager1 = FileBackedTaskManager.loadFromFile(tempFile);
 
         //then
