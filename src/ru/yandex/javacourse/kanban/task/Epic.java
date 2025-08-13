@@ -1,15 +1,26 @@
 package ru.yandex.javacourse.kanban.task;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import static java.util.Collections.min;
+
 public class Epic extends Task {
     private TaskStatus status;
+    private Duration duration;
+    private LocalDateTime starTime;
+    private LocalDateTime endTime;
+
     private final ArrayList<SubTask> subTasksList = new ArrayList<>();
 
     public Epic(String name, String description, int taskId) {
         super(name, description, taskId);
         this.status = TaskStatus.NEW;
+        this.duration = Duration.ofMinutes(0);
+        this.starTime = null;
+        this.endTime = null;
     }
 
     @Override
@@ -27,6 +38,20 @@ public class Epic extends Task {
 
     public void clearSubTaskList() {
         subTasksList.clear();
+    }
+
+    @Override
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public LocalDateTime getStarTime() {
+        return starTime;
+    }
+
+    @Override
+    public LocalDateTime getEndTime() {
+        return endTime;
     }
 
     public void setStatus() {
@@ -66,6 +91,46 @@ public class Epic extends Task {
         }
     }
 
+    public void setDuration(){
+        if (subTasksList.isEmpty()) {
+            this.duration = Duration.ofMinutes(0);
+            return;
+        }
+
+        Duration allSubTaskDuration = null;
+
+        for (SubTask st : subTasksList) {
+            allSubTaskDuration.plusMinutes(st.getDuration().toMinutes());
+        }
+
+        this.duration = allSubTaskDuration;
+    }
+
+    public void setStarAndEndTime(){
+        if (subTasksList.isEmpty()) {
+            this.starTime = null;
+            this.endTime = null;
+            return;
+        }
+
+        LocalDateTime minStartSubTaskTime = subTasksList.getFirst().getStartTime();
+        LocalDateTime maxStartSubTaskTime = subTasksList.getFirst().getEndTime();
+
+        for (SubTask st : subTasksList) {
+            if(st.getStartTime().isBefore(minStartSubTaskTime)){
+                minStartSubTaskTime = st.getStartTime();
+            }
+
+            if(st.getEndTime().isAfter(maxStartSubTaskTime)){
+                maxStartSubTaskTime = st.getEndTime();
+            }
+        }
+
+        this.starTime = minStartSubTaskTime;
+        this.endTime = maxStartSubTaskTime;
+
+    }
+
     @Override
     public String getName() {
         return super.getName();
@@ -88,6 +153,8 @@ public class Epic extends Task {
                 ", description='" + super.getDescription() + '\'' +
                 ", id=" + super.getId() +
                 ", status=" + status +
+                ", duration=" + duration +
+                ", starTime=" + starTime +
                 ", subTaskList=" + subTasksList +
                 '}';
     }
