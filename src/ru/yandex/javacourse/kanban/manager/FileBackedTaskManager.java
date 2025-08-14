@@ -14,8 +14,7 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static ru.yandex.javacourse.kanban.Stubs.FORMATTER;
 import static ru.yandex.javacourse.kanban.manager.TaskType.*;
@@ -208,19 +207,32 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
     }
 
+
     @Override
     public ArrayList<SubTask> getAllSubTaskByEpic(Task epic) {
         return super.getAllSubTaskByEpic(epic);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
-    }
+    public TreeSet<Task> getPrioritizedTasks (){
+        final Comparator<Task> taskComparator = new Comparator<Task>() {
+            @Override
+            public int compare(Task o1, Task o2) {
+                int timeComparison =  o1.getStartTime().compareTo(o2.getStartTime());
+                if(timeComparison != 0) {return timeComparison;}
 
-    @Override
-    public int hashCode() {
-        return super.hashCode();
+                return Integer.compare(o1.getId(), o2.getId());
+            }
+        };
+
+        ArrayList<Task> allTasksList = new ArrayList<>();
+        allTasksList.addAll(getAllTaskList());
+        allTasksList.addAll(getAllEpicList());
+        allTasksList.addAll(getAllSubTaskList());
+
+        TreeSet<Task> sortedAllObjectTask = new TreeSet<>(taskComparator);
+        sortedAllObjectTask.addAll(allTasksList);
+
+        return sortedAllObjectTask;
     }
 
     String toString(Task task) throws InvalidTaskTypeException {
@@ -312,4 +324,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             default -> throw new InvalidTaskTypeException("Такова типа задач нет!");
         }
     }
+
+
 }

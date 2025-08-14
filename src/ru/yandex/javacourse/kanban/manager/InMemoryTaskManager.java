@@ -4,9 +4,7 @@ import ru.yandex.javacourse.kanban.task.Epic;
 import ru.yandex.javacourse.kanban.task.SubTask;
 import ru.yandex.javacourse.kanban.task.Task;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
     private int idCounter = 0;
@@ -16,7 +14,7 @@ public class InMemoryTaskManager implements TaskManager {
     private final HashMap<Integer, Task> taskMap = new HashMap<>();
     private final HashMap<Integer, Epic> epicMap = new HashMap<>();
     private final HashMap<Integer, SubTask> subTaskMap = new HashMap<>();
-
+    private final TreeSet<Task> sortedTask = new TreeSet<>();
 
     public void setHistoryManager(HistoryManager historyManager) {
         this.historyManager = historyManager;

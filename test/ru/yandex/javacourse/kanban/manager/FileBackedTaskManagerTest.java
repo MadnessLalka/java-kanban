@@ -18,6 +18,9 @@ import java.nio.file.Files;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static ru.yandex.javacourse.kanban.manager.Stubs.FILE_HEADER;
@@ -243,4 +246,43 @@ public class FileBackedTaskManagerTest {
         assertEquals(newSubTask, fileBackedTaskManager1.getSubTaskById(2),
                 "Подзадачи должны быть эквивалентны");
     }
+
+    @DisplayName("Вывод отсортированного списка всех задач")
+    @Test
+    void get_GetAllSortedTasksObject_FromAllList()  {
+        //given
+        Task newTask = new Task("Первая задача", "Описание первой задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
+
+        Epic newEpic = new Epic("Первый эпик", "Описание первого Эпика",
+                inMemoryTaskManager.getNewId());
+
+        SubTask newSubTask = new SubTask("Первая подзадача", "Описание первой подзадачи",
+                inMemoryTaskManager.getNewId(), TaskStatus.IN_PROGRESS, newEpic.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2024, 11, 1, 1, 1));
+
+        SubTask newSubTask1 = new SubTask("Вторая подзадача", "Описание второй подзадачи",
+                inMemoryTaskManager.getNewId(), TaskStatus.NEW, newEpic.getId(),
+                Duration.of(40, ChronoUnit.MINUTES),
+                LocalDateTime.of(2023, 10, 1, 1, 1));
+
+        //when
+        fileBackedTaskManager.createTask(newTask);
+        fileBackedTaskManager.createEpic(newEpic);
+        fileBackedTaskManager.createSubTask(newSubTask);
+        fileBackedTaskManager.createSubTask(newSubTask1);
+
+        LinkedList<Task> trueOrderTaskList = new LinkedList<>(List.of(newEpic, newSubTask1, newSubTask, newTask));
+        LinkedList<Task> true2OrderTaskList = new LinkedList<>(List.copyOf(fileBackedTaskManager.getPrioritizedTasks()));
+
+        //then
+        assertEquals(trueOrderTaskList, true2OrderTaskList,
+                "Списки должны быть эквивалентны");
+
+    }
+
 }
