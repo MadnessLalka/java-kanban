@@ -88,6 +88,9 @@ public class InMemoryTaskManager implements TaskManager {
             }
             epic.clearSubTaskList();
             epic.setStatus();
+            epic.setDuration();
+            epic.setStartTime();
+            epic.setEndTime();
         }
 
         subTaskMap.clear();
@@ -144,6 +147,9 @@ public class InMemoryTaskManager implements TaskManager {
         }
 
         epic.setStatus();
+        epic.setDuration();
+        epic.setStartTime();
+        epic.setEndTime();
 
         epicMap.put(epic.getId(), epic);
         System.out.println("Эпик добавлен");
@@ -167,6 +173,7 @@ public class InMemoryTaskManager implements TaskManager {
         System.out.println("Подзадача добавлена");
 
         epicStatusChangerBySubTaskId(subTask.getEpicId());
+        epicTimeChangerBySubTaskId(subTask.getEpicId());
     }
 
     private void epicStatusChangerBySubTaskId(int currentEpicId) {
@@ -175,6 +182,21 @@ public class InMemoryTaskManager implements TaskManager {
             currentEpic.setStatus();
             System.out.println("Статус Эпика '" + currentEpic.getName() + "' был изменён на '" +
                     currentEpic.getStatus() + "'");
+        }
+    }
+
+    private void epicTimeChangerBySubTaskId(int currentEpicId) {
+        if (isEpicExist(epicMap.get(currentEpicId))) {
+            Epic currentEpic = epicMap.get(currentEpicId);
+            currentEpic.setDuration();
+            currentEpic.setStartTime();
+            currentEpic.setEndTime();
+            System.out.println("Протяженность исполнения Эпика '" + currentEpic.getName() + "' было изменёно на '" +
+                    currentEpic.getDuration() + "'");
+            System.out.println("Дата начала Эпика '" + currentEpic.getName() + "' была изменёна на '" +
+                    currentEpic.getStartTime() + "'");
+            System.out.println("Дата конца исполнения Эпика '" + currentEpic.getName() + "' была изменёна на '" +
+                    currentEpic.getEndTime() + "'");
         }
     }
 
@@ -201,6 +223,9 @@ public class InMemoryTaskManager implements TaskManager {
         }
 
         epic.setStatus();
+        epic.setDuration();
+        epic.setStartTime();
+        epic.setEndTime();
 
         System.out.println("Эпик обновлен");
         epicMap.put(epic.getId(), epic);
@@ -223,6 +248,7 @@ public class InMemoryTaskManager implements TaskManager {
         subTaskMap.put(subTask.getId(), subTask);
 
         epicStatusChangerBySubTaskId(subTask.getEpicId());
+        epicTimeChangerBySubTaskId(subTask.getEpicId());
     }
 
     @Override
@@ -277,6 +303,7 @@ public class InMemoryTaskManager implements TaskManager {
         subTaskMap.remove(subTaskId);
 
         epicStatusChangerBySubTaskId(currentEpic.getId());
+        epicTimeChangerBySubTaskId(currentEpic.getId());
     }
 
     @Override

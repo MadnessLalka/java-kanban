@@ -10,19 +10,25 @@ import ru.yandex.javacourse.kanban.task.TaskStatus;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.Month;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+
+import static ru.yandex.javacourse.kanban.Stubs.FORMATTER;
 
 public class Main {
 
     public static void main(String[] args) {
+
         TaskManager taskManager = Managers.getDefault();
         HistoryManager historyManager = Managers.getDefaultHistory();
 
+
         Task firstTask = new Task("Первая задача", "Описание первой задачи", taskManager.getNewId(),
-                TaskStatus.NEW, Duration.of(30, ChronoUnit.MINUTES), LocalDateTime.of(2025, 12, 1, 1, 1));
+                TaskStatus.NEW, Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.parse("2025 12 01 01 01", FORMATTER));
         Task secondTask = new Task("Вторая задача", "Описание второй задачи", taskManager.getNewId(),
-                TaskStatus.NEW, Duration.of(29, ChronoUnit.MINUTES), LocalDateTime.of(2025, 11, 1, 1, 1));
+                TaskStatus.NEW, Duration.of(29, ChronoUnit.MINUTES),
+                LocalDateTime.parse("2025 11 01 01 01", FORMATTER));
 
         taskManager.createTask(firstTask);
         taskManager.createTask(secondTask);
@@ -31,20 +37,26 @@ public class Main {
         Epic firstEpic = new Epic("Первый эпик", "Описание первого Эпика", taskManager.getNewId());
         taskManager.createEpic(firstEpic);
 
-//
-//        SubTask firstSubTask = new SubTask("Первая подзадача", "Описание первой подзадачи",
-//                taskManager.getNewId(), TaskStatus.DONE, firstEpic.getId());
-//        SubTask secondSubTask = new SubTask("Вторая подзадача", "Описание второй подзадачи",
-//                taskManager.getNewId(), TaskStatus.IN_PROGRESS, firstEpic.getId());
-//
-//        taskManager.createSubTask(firstSubTask);
-//        taskManager.createSubTask(secondSubTask);
-//
-//
-//        SubTask thirdSubTask = new SubTask("Третья подзадача", "Описание третий подзадачи первого эпика",
-//                taskManager.getNewId(), TaskStatus.NEW, firstEpic.getId());
 
-//        taskManager.createSubTask(thirdSubTask);
+        SubTask firstSubTask = new SubTask("Первая подзадача", "Описание первой подзадачи",
+                taskManager.getNewId(), TaskStatus.DONE, firstEpic.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.parse("2025 09 01 01 01", FORMATTER));
+        SubTask secondSubTask = new SubTask("Вторая подзадача", "Описание второй подзадачи",
+                taskManager.getNewId(), TaskStatus.IN_PROGRESS, firstEpic.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.parse("2025 08 01 01 01", FORMATTER));
+
+        taskManager.createSubTask(firstSubTask);
+        taskManager.createSubTask(secondSubTask);
+
+
+        SubTask thirdSubTask = new SubTask("Третья подзадача", "Описание третий подзадачи первого эпика",
+                taskManager.getNewId(), TaskStatus.NEW, firstEpic.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.parse("2025 07 01 01 01", FORMATTER));
+
+        taskManager.createSubTask(thirdSubTask);
 
 
         Epic secondEpic = new Epic("Второй эпик", "Описание второго Эпика", taskManager.getNewId());

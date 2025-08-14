@@ -15,9 +15,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Files;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static ru.yandex.javacourse.kanban.manager.Stubs.FILE_HEADER;
+import static ru.yandex.javacourse.kanban.manager.Stubs.FORMATTER;
 
 public class FileBackedTaskManagerTest {
     public static FileBackedTaskManager fileBackedTaskManager;
@@ -43,13 +47,15 @@ public class FileBackedTaskManagerTest {
         //given
         Task newTask = new Task("Первая задача", "Описание первой задачи",
                 inMemoryTaskManager.getNewId(),
-                TaskStatus.NEW);
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
 
         //when
         String taskToString = fileBackedTaskManager.toString(newTask);
 
         //then
-        assertEquals(("0,TASK,Первая задача,NEW,Описание первой задачи"), taskToString,
+        assertEquals(("0,TASK,Первая задача,NEW,Описание первой задачи,30,2025 12 01 01 01"), taskToString,
                 "Текстовое описание должно быть эквивалентно");
     }
 
@@ -64,7 +70,9 @@ public class FileBackedTaskManagerTest {
         String epicToString = fileBackedTaskManager.toString(newEpic);
 
         //then
-        assertEquals(("0,EPIC,Первый эпик,NEW,Описание первого Эпика"), epicToString,
+        assertEquals(("0,EPIC,Первый эпик,NEW,Описание первого Эпика,0,"
+                        + LocalDateTime.now().format(FORMATTER) + ","
+                        + LocalDateTime.now().format(FORMATTER)), epicToString,
                 "Текстовое описание должно быть эквивалентно");
     }
 
@@ -75,13 +83,16 @@ public class FileBackedTaskManagerTest {
         Epic newEpic = new Epic("Первый эпик", "Описание первого Эпика",
                 inMemoryTaskManager.getNewId());
         SubTask newSubTask = new SubTask("Вторая подзадача", "Описание второй подзадачи",
-                inMemoryTaskManager.getNewId(), TaskStatus.IN_PROGRESS, newEpic.getId());
+                inMemoryTaskManager.getNewId(), TaskStatus.IN_PROGRESS, newEpic.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.parse(LocalDateTime.of(2025, 12, 1, 1, 1)
+                        .format(FORMATTER), FORMATTER));
 
         //when
         String subTaskToString = fileBackedTaskManager.toString(newSubTask);
 
         //then
-        assertEquals(("1,SUBTASK,Вторая подзадача,IN_PROGRESS,Описание второй подзадачи,0"), subTaskToString,
+        assertEquals(("1,SUBTASK,Вторая подзадача,IN_PROGRESS,Описание второй подзадачи,0,30,2025 12 01 01 01"), subTaskToString,
                 "Текстовое описание должно быть эквивалентно");
     }
 
@@ -91,7 +102,9 @@ public class FileBackedTaskManagerTest {
         //given
         Task newTask = new Task("Первая задача", "Описание первой задачи",
                 inMemoryTaskManager.getNewId(),
-                TaskStatus.NEW);
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
 
         //when
         String taskToString = fileBackedTaskManager.toString(newTask);
@@ -123,7 +136,9 @@ public class FileBackedTaskManagerTest {
         Epic newEpic = new Epic("Первый эпик", "Описание первого Эпика",
                 inMemoryTaskManager.getNewId());
         SubTask newSubTask = new SubTask("Вторая подзадача", "Описание второй подзадачи",
-                inMemoryTaskManager.getNewId(), TaskStatus.IN_PROGRESS, newEpic.getId());
+                inMemoryTaskManager.getNewId(), TaskStatus.IN_PROGRESS, newEpic.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
 
         //when
         String subTaskToString = fileBackedTaskManager.toString(newSubTask);
@@ -137,7 +152,7 @@ public class FileBackedTaskManagerTest {
     @Test
     void add_isSaved_EmptyFileToDisk() throws IOException {
         //given
-        String fileHeader = "id,type,name,status,description,epic";
+        String fileHeader = "id,type,name,status,description,epic,duration,startTime,endTime";
 
         //when
         fileBackedTaskManager.save();
@@ -165,11 +180,15 @@ public class FileBackedTaskManagerTest {
         //given
         Task newTask = new Task("Первая задача", "Описание первой задачи",
                 inMemoryTaskManager.getNewId(),
-                TaskStatus.NEW);
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
         Epic newEpic = new Epic("Первый эпик", "Описание первого Эпика",
                 inMemoryTaskManager.getNewId());
         SubTask newSubTask = new SubTask("Вторая подзадача", "Описание второй подзадачи",
-                inMemoryTaskManager.getNewId(), TaskStatus.IN_PROGRESS, newEpic.getId());
+                inMemoryTaskManager.getNewId(), TaskStatus.IN_PROGRESS, newEpic.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 11, 1, 1, 1));
 
         //when
         fileBackedTaskManager.createTask(newTask);
@@ -194,11 +213,19 @@ public class FileBackedTaskManagerTest {
         //given
         Task newTask = new Task("Первая задача", "Описание первой задачи",
                 inMemoryTaskManager.getNewId(),
-                TaskStatus.NEW);
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.parse(
+                        LocalDateTime.of(2025, 12, 1, 1, 1).format(FORMATTER),
+                        FORMATTER));
         Epic newEpic = new Epic("Первый эпик", "Описание первого Эпика",
                 inMemoryTaskManager.getNewId());
         SubTask newSubTask = new SubTask("Вторая подзадача", "Описание второй подзадачи",
-                inMemoryTaskManager.getNewId(), TaskStatus.IN_PROGRESS, newEpic.getId());
+                inMemoryTaskManager.getNewId(), TaskStatus.IN_PROGRESS, newEpic.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.parse(
+                        LocalDateTime.of(2024, 12, 1, 1, 1).format(FORMATTER),
+                        FORMATTER));
 
         Writer fileWriter = new FileWriter(tempFile, true);
         fileWriter.write(FILE_HEADER + "\n");

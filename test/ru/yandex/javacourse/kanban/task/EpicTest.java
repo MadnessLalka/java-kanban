@@ -5,6 +5,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.yandex.javacourse.kanban.manager.InMemoryTaskManager;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class EpicTest {
@@ -37,7 +40,8 @@ public class EpicTest {
         Epic newEpic = new Epic("Первый эпик", "Описание первого Эпика",
                 inMemoryTaskManager.getNewId());
         SubTask newSubTask = new SubTask("Первая подзадача", "Описание второй подзадачи",
-                inMemoryTaskManager.getNewId(), TaskStatus.IN_PROGRESS, newEpic.getId());
+                inMemoryTaskManager.getNewId(), TaskStatus.IN_PROGRESS, newEpic.getId(), Duration.ofMinutes(30),
+                LocalDateTime.of(2025, 11, 1, 1, 1));
 
         //when
         assertEquals(TaskStatus.NEW, newEpic.getStatus(), "Статус созданного эпик должен быть NEW");
@@ -56,7 +60,8 @@ public class EpicTest {
         Epic newEpic = new Epic("Первый эпик", "Описание первого Эпика",
                 inMemoryTaskManager.getNewId());
         SubTask newSubTask = new SubTask("Первая подзадача", "Описание второй подзадачи",
-                inMemoryTaskManager.getNewId(), TaskStatus.DONE, newEpic.getId());
+                inMemoryTaskManager.getNewId(), TaskStatus.DONE, newEpic.getId(), Duration.ofMinutes(30),
+                LocalDateTime.of(2025, 11, 1, 1, 1));
 
         //when
         assertEquals(TaskStatus.NEW, newEpic.getStatus(), "Статус созданного эпик должен быть NEW");
@@ -74,7 +79,8 @@ public class EpicTest {
         Epic newEpic = new Epic("Первый эпик", "Описание первого Эпика",
                 inMemoryTaskManager.getNewId());
         SubTask newSubTask = new SubTask("Первая подзадача", "Описание второй подзадачи",
-                inMemoryTaskManager.getNewId(), TaskStatus.DONE, newEpic.getId());
+                inMemoryTaskManager.getNewId(), TaskStatus.DONE, newEpic.getId(), Duration.ofMinutes(30),
+                LocalDateTime.of(2025, 11, 1, 1, 1));
 
         newEpic.addSubTaskToList(newSubTask);
         newEpic.setStatus();

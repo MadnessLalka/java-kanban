@@ -1,16 +1,17 @@
 package ru.yandex.javacourse.kanban.task;
 
+
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import static java.util.Collections.min;
+import static ru.yandex.javacourse.kanban.Stubs.FORMATTER;
 
 public class Epic extends Task {
     private TaskStatus status;
     private Duration duration;
-    private LocalDateTime starTime;
+    private LocalDateTime startTime;
     private LocalDateTime endTime;
 
     private final ArrayList<SubTask> subTasksList = new ArrayList<>();
@@ -19,8 +20,8 @@ public class Epic extends Task {
         super(name, description, taskId);
         this.status = TaskStatus.NEW;
         this.duration = Duration.ofMinutes(0);
-        this.starTime = null;
-        this.endTime = null;
+        this.startTime = LocalDateTime.parse(LocalDateTime.now().format(FORMATTER), FORMATTER);
+        this.endTime = LocalDateTime.parse(LocalDateTime.now().format(FORMATTER), FORMATTER);
     }
 
     @Override
@@ -45,8 +46,8 @@ public class Epic extends Task {
         return duration;
     }
 
-    public LocalDateTime getStarTime() {
-        return starTime;
+    public LocalDateTime getStartTime() {
+        return startTime;
     }
 
     @Override
@@ -91,13 +92,13 @@ public class Epic extends Task {
         }
     }
 
-    public void setDuration(){
+    public void setDuration() {
         if (subTasksList.isEmpty()) {
             this.duration = Duration.ofMinutes(0);
             return;
         }
 
-        Duration allSubTaskDuration = null;
+        Duration allSubTaskDuration = Duration.ofMinutes(0);
 
         for (SubTask st : subTasksList) {
             allSubTaskDuration.plusMinutes(st.getDuration().toMinutes());
@@ -106,29 +107,40 @@ public class Epic extends Task {
         this.duration = allSubTaskDuration;
     }
 
-    public void setStarAndEndTime(){
+    public void setStartTime() {
         if (subTasksList.isEmpty()) {
-            this.starTime = null;
-            this.endTime = null;
+            this.startTime = LocalDateTime.parse(LocalDateTime.now().format(FORMATTER), FORMATTER);
             return;
         }
 
         LocalDateTime minStartSubTaskTime = subTasksList.getFirst().getStartTime();
-        LocalDateTime maxStartSubTaskTime = subTasksList.getFirst().getEndTime();
 
         for (SubTask st : subTasksList) {
-            if(st.getStartTime().isBefore(minStartSubTaskTime)){
+            if (st.getStartTime().isBefore(minStartSubTaskTime)) {
                 minStartSubTaskTime = st.getStartTime();
-            }
-
-            if(st.getEndTime().isAfter(maxStartSubTaskTime)){
-                maxStartSubTaskTime = st.getEndTime();
             }
         }
 
-        this.starTime = minStartSubTaskTime;
-        this.endTime = maxStartSubTaskTime;
+        this.startTime = minStartSubTaskTime;
 
+
+    }
+
+    public void setEndTime() {
+        if (subTasksList.isEmpty()) {
+            this.endTime = LocalDateTime.parse(LocalDateTime.now().format(FORMATTER), FORMATTER);
+            return;
+        }
+
+        LocalDateTime maxEndSubTaskTime = subTasksList.getFirst().getEndTime();
+
+        for (SubTask st : subTasksList) {
+            if (st.getEndTime().isAfter(maxEndSubTaskTime)) {
+                maxEndSubTaskTime = st.getEndTime();
+            }
+        }
+
+        this.endTime = maxEndSubTaskTime;
     }
 
     @Override
@@ -154,7 +166,8 @@ public class Epic extends Task {
                 ", id=" + super.getId() +
                 ", status=" + status +
                 ", duration=" + duration +
-                ", starTime=" + starTime +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
                 ", subTaskList=" + subTasksList +
                 '}';
     }

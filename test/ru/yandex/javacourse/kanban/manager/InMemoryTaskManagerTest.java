@@ -8,6 +8,10 @@ import ru.yandex.javacourse.kanban.task.SubTask;
 import ru.yandex.javacourse.kanban.task.Task;
 import ru.yandex.javacourse.kanban.task.TaskStatus;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class InMemoryTaskManagerTest {
@@ -56,7 +60,9 @@ public class InMemoryTaskManagerTest {
         int realCountTasks = 1;
         Task newTask = new Task("Первая задача", "Описание первой задачи",
                 inMemoryTaskManager.getNewId(),
-                TaskStatus.NEW);
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
 
         //when
         inMemoryTaskManager.createTask(newTask);
@@ -89,7 +95,9 @@ public class InMemoryTaskManagerTest {
 
         Epic newEpic = new Epic("Первый эпик", "Описание первого Эпика", inMemoryTaskManager.getNewId());
         SubTask newSubTask = new SubTask("Вторая подзадача", "Описание второй подзадачи",
-                inMemoryTaskManager.getNewId(), TaskStatus.IN_PROGRESS, newEpic.getId());
+                inMemoryTaskManager.getNewId(), TaskStatus.IN_PROGRESS, newEpic.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
 
         //when
         inMemoryTaskManager.createEpic(newEpic);
@@ -108,13 +116,19 @@ public class InMemoryTaskManagerTest {
 
         Task newTask1 = new Task("Первая задача", "Описание первой задачи",
                 inMemoryTaskManager.getNewId(),
-                TaskStatus.NEW);
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
         Task newTask2 = new Task("Вторя задача", "Описание первой задачи",
                 inMemoryTaskManager.getNewId(),
-                TaskStatus.NEW);
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 11, 1, 1, 1));
         Task newTask3 = new Task("Третья задача", "Описание первой задачи",
                 inMemoryTaskManager.getNewId(),
-                TaskStatus.NEW);
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 10, 1, 1, 1));
 
         //when
         inMemoryTaskManager.createTask(newTask1);
@@ -162,11 +176,17 @@ public class InMemoryTaskManagerTest {
         Epic newEpic1 = new Epic("Первый эпик", "Описание первого Эпика",
                 inMemoryTaskManager.getNewId());
         SubTask newSubTask1 = new SubTask("Первая подзадача", "Описание первой подзадачи",
-                inMemoryTaskManager.getNewId(), TaskStatus.DONE, newEpic1.getId());
+                inMemoryTaskManager.getNewId(), TaskStatus.DONE, newEpic1.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
         SubTask newSubTask2 = new SubTask("Вторая подзадача", "Описание первой подзадачи",
-                inMemoryTaskManager.getNewId(), TaskStatus.DONE, newEpic1.getId());
+                inMemoryTaskManager.getNewId(), TaskStatus.DONE, newEpic1.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 11, 1, 1, 1));
         SubTask newSubTask3 = new SubTask("Третья подзадача", "Описание первой подзадачи",
-                inMemoryTaskManager.getNewId(), TaskStatus.DONE, newEpic1.getId());
+                inMemoryTaskManager.getNewId(), TaskStatus.DONE, newEpic1.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 10, 1, 1, 1));
 
         //when
         inMemoryTaskManager.createEpic(newEpic1);
@@ -196,11 +216,17 @@ public class InMemoryTaskManagerTest {
         Epic newEpic1 = new Epic("Первый эпик", "Описание первого Эпика",
                 inMemoryTaskManager.getNewId());
         SubTask newSubTask1 = new SubTask("Первая подзадача", "Описание первой подзадачи",
-                inMemoryTaskManager.getNewId(), TaskStatus.DONE, newEpic1.getId());
+                inMemoryTaskManager.getNewId(), TaskStatus.DONE, newEpic1.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
         SubTask newSubTask2 = new SubTask("Вторая подзадача", "Описание первой подзадачи",
-                inMemoryTaskManager.getNewId(), TaskStatus.DONE, newEpic1.getId());
+                inMemoryTaskManager.getNewId(), TaskStatus.DONE, newEpic1.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 11, 1, 1, 1));
         SubTask newSubTask3 = new SubTask("Третья подзадача", "Описание первой подзадачи",
-                inMemoryTaskManager.getNewId(), TaskStatus.DONE, newEpic1.getId());
+                inMemoryTaskManager.getNewId(), TaskStatus.DONE, newEpic1.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 10, 1, 1, 1));
 
         //when
         inMemoryTaskManager.createEpic(newEpic1);
@@ -228,13 +254,19 @@ public class InMemoryTaskManagerTest {
 
         Task newTask1 = new Task("Первая задача", "Описание первой задачи",
                 inMemoryTaskManager.getNewId(),
-                TaskStatus.NEW);
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
         Task newTask2 = new Task("Вторя задача", "Описание первой задачи",
                 inMemoryTaskManager.getNewId(),
-                TaskStatus.NEW);
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 11, 1, 1, 1));
         Task newTask3 = new Task("Третья задача", "Описание первой задачи",
                 inMemoryTaskManager.getNewId(),
-                TaskStatus.NEW);
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 10, 1, 1, 1));
 
         //when
         inMemoryTaskManager.createTask(newTask1);
@@ -258,11 +290,17 @@ public class InMemoryTaskManagerTest {
         Epic newEpic1 = new Epic("Первый эпик", "Описание первого Эпика",
                 inMemoryTaskManager.getNewId());
         SubTask newSubTask1 = new SubTask("Первая подзадача", "Описание первой подзадачи",
-                inMemoryTaskManager.getNewId(), TaskStatus.DONE, newEpic1.getId());
+                inMemoryTaskManager.getNewId(), TaskStatus.DONE, newEpic1.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
         SubTask newSubTask2 = new SubTask("Вторая подзадача", "Описание первой подзадачи",
-                inMemoryTaskManager.getNewId(), TaskStatus.DONE, newEpic1.getId());
+                inMemoryTaskManager.getNewId(), TaskStatus.DONE, newEpic1.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 11, 1, 1, 1));
         SubTask newSubTask3 = new SubTask("Третья подзадача", "Описание первой подзадачи",
-                inMemoryTaskManager.getNewId(), TaskStatus.DONE, newEpic1.getId());
+                inMemoryTaskManager.getNewId(), TaskStatus.DONE, newEpic1.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 10, 1, 1, 1));
 
         //when
         inMemoryTaskManager.createEpic(newEpic1);
@@ -288,13 +326,19 @@ public class InMemoryTaskManagerTest {
 
         Task newTask1 = new Task("Первая задача", "Описание первой задачи",
                 inMemoryTaskManager.getNewId(),
-                TaskStatus.NEW);
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
         Task newTask2 = new Task("Вторя задача", "Описание первой задачи",
                 inMemoryTaskManager.getNewId(),
-                TaskStatus.NEW);
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 11, 1, 1, 1));
         Task newTask3 = new Task("Третья задача", "Описание первой задачи",
                 inMemoryTaskManager.getNewId(),
-                TaskStatus.NEW);
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 10, 1, 1, 1));
 
         //when
         inMemoryTaskManager.createTask(newTask1);
@@ -362,11 +406,17 @@ public class InMemoryTaskManagerTest {
         Epic newEpic1 = new Epic("Первый эпик", "Описание первого Эпика",
                 inMemoryTaskManager.getNewId());
         SubTask newSubTask1 = new SubTask("Первая подзадача", "Описание первой подзадачи",
-                inMemoryTaskManager.getNewId(), TaskStatus.DONE, newEpic1.getId());
+                inMemoryTaskManager.getNewId(), TaskStatus.DONE, newEpic1.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
         SubTask newSubTask2 = new SubTask("Первая подзадача", "Описание первой подзадачи",
-                inMemoryTaskManager.getNewId(), TaskStatus.DONE, newEpic1.getId());
+                inMemoryTaskManager.getNewId(), TaskStatus.DONE, newEpic1.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 11, 1, 1, 1));
         SubTask newSubTask3 = new SubTask("Первая подзадача", "Описание первой подзадачи",
-                inMemoryTaskManager.getNewId(), TaskStatus.DONE, newEpic1.getId());
+                inMemoryTaskManager.getNewId(), TaskStatus.DONE, newEpic1.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 10, 1, 1, 1));
 
         //when
         inMemoryTaskManager.createEpic(newEpic1);
