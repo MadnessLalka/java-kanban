@@ -122,7 +122,7 @@ public class MainTest {
         Epic epicClone = taskManager.getEpicById(1);
 
         //then
-//        assertEquals(epic, epicClone, "Эпики с одинаковым ID - должны быть эквиваленты");
+        assertEquals(epic, epicClone, "Эпики с одинаковым ID - должны быть эквиваленты");
     }
 
 

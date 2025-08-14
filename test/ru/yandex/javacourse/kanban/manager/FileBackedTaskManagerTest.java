@@ -85,14 +85,14 @@ public class FileBackedTaskManagerTest {
         SubTask newSubTask = new SubTask("Вторая подзадача", "Описание второй подзадачи",
                 inMemoryTaskManager.getNewId(), TaskStatus.IN_PROGRESS, newEpic.getId(),
                 Duration.of(30, ChronoUnit.MINUTES),
-                LocalDateTime.parse(LocalDateTime.of(2025, 12, 1, 1, 1)
-                        .format(FORMATTER), FORMATTER));
+                LocalDateTime.of(2025, 12, 1, 1, 1));
 
         //when
         String subTaskToString = fileBackedTaskManager.toString(newSubTask);
 
         //then
-        assertEquals(("1,SUBTASK,Вторая подзадача,IN_PROGRESS,Описание второй подзадачи,0,30,2025 12 01 01 01"), subTaskToString,
+        assertEquals(("1,SUBTASK,Вторая подзадача,IN_PROGRESS,Описание второй подзадачи,0,30,2025 12 01 01 01"),
+                subTaskToString,
                 "Текстовое описание должно быть эквивалентно");
     }
 
@@ -207,7 +207,7 @@ public class FileBackedTaskManagerTest {
                 "Строки должны быть эквивалентны");
     }
 
-    @DisplayName("Проверка загрузки задач в при перезапуске программы")
+    @DisplayName("Проверка загрузки задач при перезапуске программы")
     @Test
     void add_isImport_FromStringToProgram() throws IOException, InvalidTaskTypeException {
         //given
@@ -215,17 +215,15 @@ public class FileBackedTaskManagerTest {
                 inMemoryTaskManager.getNewId(),
                 TaskStatus.NEW,
                 Duration.of(30, ChronoUnit.MINUTES),
-                LocalDateTime.parse(
-                        LocalDateTime.of(2025, 12, 1, 1, 1).format(FORMATTER),
-                        FORMATTER));
+                LocalDateTime.of(2025, 12, 1, 1, 1));
+
         Epic newEpic = new Epic("Первый эпик", "Описание первого Эпика",
                 inMemoryTaskManager.getNewId());
+
         SubTask newSubTask = new SubTask("Вторая подзадача", "Описание второй подзадачи",
                 inMemoryTaskManager.getNewId(), TaskStatus.IN_PROGRESS, newEpic.getId(),
                 Duration.of(30, ChronoUnit.MINUTES),
-                LocalDateTime.parse(
-                        LocalDateTime.of(2024, 12, 1, 1, 1).format(FORMATTER),
-                        FORMATTER));
+                LocalDateTime.of(2024, 12, 1, 1, 1));
 
         Writer fileWriter = new FileWriter(tempFile, true);
         fileWriter.write(FILE_HEADER + "\n");
@@ -235,7 +233,6 @@ public class FileBackedTaskManagerTest {
         fileWriter.close();
 
         //when
-
         FileBackedTaskManager fileBackedTaskManager1 = FileBackedTaskManager.loadFromFile(tempFile);
 
         //then

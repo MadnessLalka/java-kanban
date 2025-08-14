@@ -191,6 +191,7 @@ public class InMemoryTaskManager implements TaskManager {
             currentEpic.setDuration();
             currentEpic.setStartTime();
             currentEpic.setEndTime();
+
             System.out.println("Протяженность исполнения Эпика '" + currentEpic.getName() + "' было изменёно на '" +
                     currentEpic.getDuration() + "'");
             System.out.println("Дата начала Эпика '" + currentEpic.getName() + "' была изменёна на '" +

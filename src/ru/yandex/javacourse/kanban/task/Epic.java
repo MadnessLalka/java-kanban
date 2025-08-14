@@ -46,6 +46,7 @@ public class Epic extends Task {
         return duration;
     }
 
+    @Override
     public LocalDateTime getStartTime() {
         return startTime;
     }
@@ -101,15 +102,20 @@ public class Epic extends Task {
         Duration allSubTaskDuration = Duration.ofMinutes(0);
 
         for (SubTask st : subTasksList) {
-            allSubTaskDuration.plusMinutes(st.getDuration().toMinutes());
+            allSubTaskDuration = allSubTaskDuration.plus(st.getDuration());
         }
 
-        this.duration = allSubTaskDuration;
+        this.duration = Duration.ofMinutes(allSubTaskDuration.toMinutes());
     }
 
     public void setStartTime() {
         if (subTasksList.isEmpty()) {
             this.startTime = LocalDateTime.parse(LocalDateTime.now().format(FORMATTER), FORMATTER);
+            return;
+        }
+
+        if (subTasksList.size() == 1) {
+            this.startTime = subTasksList.getFirst().getStartTime();
             return;
         }
 
@@ -132,10 +138,16 @@ public class Epic extends Task {
             return;
         }
 
+        if (subTasksList.size() == 1) {
+            this.endTime = subTasksList.getFirst().getStartTime().
+                    plusMinutes(subTasksList.getFirst().getDuration().toMinutes());
+            return;
+        }
+
         LocalDateTime maxEndSubTaskTime = subTasksList.getFirst().getEndTime();
 
         for (SubTask st : subTasksList) {
-            if (st.getEndTime().isAfter(maxEndSubTaskTime)) {
+            if (st.getStartTime().isAfter(maxEndSubTaskTime)) {
                 maxEndSubTaskTime = st.getEndTime();
             }
         }
