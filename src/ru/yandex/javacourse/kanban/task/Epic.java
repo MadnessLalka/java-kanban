@@ -139,8 +139,8 @@ public class Epic extends Task {
         }
 
         if (subTasksList.size() == 1) {
-            this.endTime = subTasksList.getFirst().getStartTime().
-                    plusMinutes(subTasksList.getFirst().getDuration().toMinutes());
+            this.endTime = subTasksList.getFirst().getStartTime()
+                    .plusMinutes(subTasksList.getFirst().getDuration().toMinutes());
             return;
         }
 
