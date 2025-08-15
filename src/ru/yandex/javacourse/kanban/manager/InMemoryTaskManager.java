@@ -47,24 +47,16 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeAllTask() {
         System.out.println("Все задачи удалены");
-        for (Task task : taskMap.values()) {
-            historyManager.remove(task.getId());
-        }
-
+        taskMap.values().forEach(task -> historyManager.remove(task.getId()));
         taskMap.clear();
     }
-
 
     @Override
     public void removeAllEpic() {
         System.out.println("Все эпики удалены");
 
         for (Epic epic : epicMap.values()) {
-            ArrayList<SubTask> subTasksList = getAllSubTaskByEpic(epic);
-
-            for (SubTask subTask : subTasksList) {
-                historyManager.remove(subTask.getId());
-            }
+            getAllSubTaskByEpic(epic).forEach(subTask -> historyManager.remove(subTask.getId()));
 
             epic.clearSubTaskList();
             historyManager.remove(epic.getId());
@@ -79,11 +71,8 @@ public class InMemoryTaskManager implements TaskManager {
         System.out.println("Все подзадачи удалены");
 
         for (Epic epic : epicMap.values()) {
-            ArrayList<SubTask> subTasksList = getAllSubTaskByEpic(epic);
+            getAllSubTaskByEpic(epic).forEach(subTask -> historyManager.remove(subTask.getId()));
 
-            for (SubTask subTask : subTasksList) {
-                historyManager.remove(subTask.getId());
-            }
             epic.clearSubTaskList();
             epic.setStatus();
             epic.setDuration();
@@ -149,7 +138,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
 
         if (isTaskIntersectToAllTaskToTime(epic)) {
-            System.out.println("Эпик " + epic + " пересекается по времени с другими задачами из списка");
+            System.out.println("Эпик " + epic + " пересекаются по времени с другими задачами из списка");
             return;
         }
 
@@ -174,7 +163,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
 
         if (isTaskIntersectToAllTaskToTime(subTask)) {
-            System.out.println("Подзадача " + subTask + " пересекается по времени с другими задачами из списка");
+            System.out.println("Подзадача " + subTask + " пересекаются по времени с другими задачами из списка");
             return;
         }
 
@@ -225,7 +214,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
 
         if (isTaskIntersectToAllTaskToTime(task)) {
-            System.out.println("Задача " + task + " пересекается по времени с другими задачами из списка");
+            System.out.println("Задача " + task + " пересекаются по времени с другими задачами из списка");
             return;
         }
 
@@ -300,18 +289,16 @@ public class InMemoryTaskManager implements TaskManager {
         }
 
         Epic currentEpic = epicMap.get(epicId);
-        ArrayList<SubTask> subTasksCurrentEpic = getAllSubTaskByEpic(currentEpic);
 
-        for (SubTask st : subTasksCurrentEpic) {
-            subTaskMap.remove(st.getId());
-            historyManager.remove(st.getId());
-        }
+        getAllSubTaskByEpic(currentEpic).forEach(subTask -> {
+            subTaskMap.remove(subTask.getId());
+            historyManager.remove(subTask.getId());
+        });
 
         historyManager.remove(epicId);
         epicMap.remove(epicId);
 
         System.out.println("Эпик со всеми подзадачами был удалён");
-
     }
 
     @Override
@@ -336,14 +323,10 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public ArrayList<SubTask> getAllSubTaskByEpic(Task epic) {
-        ArrayList<SubTask> allSubTaskList = getAllSubTaskList();
-        ArrayList<SubTask> subTaskListByEpic = new ArrayList<>();
-
-        for (SubTask st : allSubTaskList) {
-            if (Objects.equals(st.getEpicId(), epic.getId())) {
-                subTaskListByEpic.add(st);
-            }
-        }
+        ArrayList<SubTask> subTaskListByEpic = new ArrayList<>(
+                getAllSubTaskList().stream()
+                        .filter(subTask -> Objects.equals(subTask.getEpicId(), epic.getId()))
+                        .toList());
 
         if (subTaskListByEpic.isEmpty()) {
             System.out.println("В этом эпики таких подзадач нет");

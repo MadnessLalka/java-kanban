@@ -10,7 +10,6 @@ import ru.yandex.javacourse.kanban.task.TaskStatus;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
 import static ru.yandex.javacourse.kanban.Stubs.FORMATTER;
@@ -22,7 +21,6 @@ public class Main {
         TaskManager taskManager = Managers.getDefault();
         HistoryManager historyManager = Managers.getDefaultHistory();
 
-
         Task firstTask = new Task("Первая задача", "Описание первой задачи", taskManager.getNewId(),
                 TaskStatus.NEW, Duration.of(30, ChronoUnit.MINUTES),
                 LocalDateTime.parse("2025 12 01 01 01", FORMATTER));
@@ -33,10 +31,8 @@ public class Main {
         taskManager.createTask(firstTask);
         taskManager.createTask(secondTask);
 
-
         Epic firstEpic = new Epic("Первый эпик", "Описание первого Эпика", taskManager.getNewId());
         taskManager.createEpic(firstEpic);
-
 
         SubTask firstSubTask = new SubTask("Первая подзадача", "Описание первой подзадачи",
                 taskManager.getNewId(), TaskStatus.DONE, firstEpic.getId(),
@@ -62,7 +58,6 @@ public class Main {
         Epic secondEpic = new Epic("Второй эпик", "Описание второго Эпика", taskManager.getNewId());
         taskManager.createEpic(secondEpic);
 
-
         taskManager.setHistoryManager(historyManager);
 
         historyManager.add(firstTask);
@@ -82,7 +77,6 @@ public class Main {
 
         taskManager.removeTaskById(firstTask.getId());
         taskManager.removeEpicById(firstEpic.getId());
-
 
         System.out.println();
         System.out.println("История просмотров");

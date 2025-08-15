@@ -15,9 +15,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.TreeSet;
 
 import static ru.yandex.javacourse.kanban.Stubs.FORMATTER;
 import static ru.yandex.javacourse.kanban.manager.TaskType.*;
@@ -82,6 +80,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
         try (Writer fileWriter = new FileWriter(path.toFile())) {
             fileWriter.write("id,type,name,status,description,epic,duration,startTime,endTime\n");
+
             for (Task t : allTasksList) {
                 fileWriter.write(toString(t) + "\n");
             }
@@ -304,6 +303,4 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             default -> throw new InvalidTaskTypeException("Такова типа задач нет!");
         }
     }
-
-
 }

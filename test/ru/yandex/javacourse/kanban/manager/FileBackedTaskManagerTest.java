@@ -5,10 +5,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.yandex.javacourse.kanban.manager.exception.InvalidTaskTypeException;
-import ru.yandex.javacourse.kanban.task.Epic;
-import ru.yandex.javacourse.kanban.task.SubTask;
-import ru.yandex.javacourse.kanban.task.Task;
-import ru.yandex.javacourse.kanban.task.TaskStatus;
+import ru.yandex.javacourse.kanban.manager.exception.ManagerReadException;
+import ru.yandex.javacourse.kanban.manager.exception.ManagerSaveException;
+import ru.yandex.javacourse.kanban.task.*;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -150,6 +149,49 @@ public class FileBackedTaskManagerTest {
         assertEquals(restoredSubTask, newSubTask, "Подзадачи должны быть эквиваленты");
     }
 
+    @DisplayName("Проверка срабатывания исключения IllegalArgumentException")
+    @Test
+    void get_Get_IllegalArgumentException() {
+        //given
+
+        TestTaskTest newTaskTest = new TestTaskTest("Первая задача", "Описание первой задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
+
+        //then
+        assertThrows(IllegalArgumentException.class, () -> {
+            fileBackedTaskManager.createTask(newTaskTest);
+        }, "Такой тип задачи не добавлен TaskType - должно быть исключение ");
+    }
+
+    @DisplayName("Проверка срабатывания исключения ManagerSaveException")
+    @Test
+    void get_Get_ManagerSaveException() {
+
+        //when
+        tempFile.setReadOnly();
+
+        //then
+        assertThrows(ManagerSaveException.class, () -> {
+            FileBackedTaskManager.loadFromFile(tempFile);
+        }, "Сохранение в данный файл невозможно");
+    }
+
+    @DisplayName("Проверка срабатывания исключения ManagerReadException")
+    @Test
+    void get_Get_ManagerReadException() {
+
+        //when
+        tempFile.setReadable(false, true);
+
+        //then
+        assertThrows(ManagerReadException.class, () -> {
+            FileBackedTaskManager.loadFromFile(tempFile);
+        }, "Чтение данного файла невозможно");
+    }
+
     @DisplayName("Проверка сохранения пустого файл")
     @Test
     void add_isSaved_EmptyFileToDisk() throws IOException {
@@ -248,7 +290,7 @@ public class FileBackedTaskManagerTest {
 
     @DisplayName("Вывод отсортированного списка всех задач")
     @Test
-    void get_GetAllSortedTasksObject_FromAllList()  {
+    void get_GetAllSortedTasksObject_FromAllList() {
         //given
         Task newTask = new Task("Первая задача", "Описание первой задачи",
                 inMemoryTaskManager.getNewId(),
@@ -332,7 +374,7 @@ public class FileBackedTaskManagerTest {
 
     @DisplayName("Проверка задач на пересечение в списках с задачами")
     @Test
-    void get_isNewTask_IntersectToAllTasks()  {
+    void get_isNewTask_IntersectToAllTasks() {
         //given
         Task newTask = new Task("Первая задача", "Описание первой задачи",
                 inMemoryTaskManager.getNewId(),
@@ -374,7 +416,7 @@ public class FileBackedTaskManagerTest {
 
     @DisplayName("Проверка задач на не пересечение в списках с задачами")
     @Test
-    void get_isNewTask_NotIntersectToAllTasks()  {
+    void get_isNewTask_NotIntersectToAllTasks() {
         //given
         Task newTask = new Task("Первая задача", "Описание первой задачи",
                 inMemoryTaskManager.getNewId(),
@@ -416,7 +458,7 @@ public class FileBackedTaskManagerTest {
 
     @DisplayName("Попытка добавить подзадачу с пересечением по времени")
     @Test
-    void add_NewSubTask_ToIntersectToAllTasks()  {
+    void add_NewSubTask_ToIntersectToAllTasks() {
         //given
         Task newTask = new Task("Первая задача", "Описание первой задачи",
                 inMemoryTaskManager.getNewId(),
