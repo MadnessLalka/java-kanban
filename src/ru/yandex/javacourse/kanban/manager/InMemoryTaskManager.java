@@ -14,7 +14,6 @@ public class InMemoryTaskManager implements TaskManager {
     private final HashMap<Integer, Task> taskMap = new HashMap<>();
     private final HashMap<Integer, Epic> epicMap = new HashMap<>();
     private final HashMap<Integer, SubTask> subTaskMap = new HashMap<>();
-    private final TreeSet<Task> sortedTask = new TreeSet<>();
 
     public void setHistoryManager(HistoryManager historyManager) {
         this.historyManager = historyManager;
@@ -51,6 +50,7 @@ public class InMemoryTaskManager implements TaskManager {
         for (Task task : taskMap.values()) {
             historyManager.remove(task.getId());
         }
+
         taskMap.clear();
     }
 
@@ -116,7 +116,6 @@ public class InMemoryTaskManager implements TaskManager {
     public SubTask getSubTaskById(int subTaskId) {
         if (!isSubTaskExist(subTaskMap.get(subTaskId))) {
             System.out.println("Подзадачи по такому id " + subTaskId + " нет");
-
         }
 
         return subTaskMap.get(subTaskId);
@@ -126,6 +125,11 @@ public class InMemoryTaskManager implements TaskManager {
     public void createTask(Task task) {
         if (isTaskExist(taskMap.get(task.getId()))) {
             System.out.println("Такая задача " + task + " уже поставлена");
+            return;
+        }
+
+        if (isTaskIntersectToAllTaskToTime(task)) {
+            System.out.println("Задача " + task + " пересекается по времени с другими задачами из списка");
             return;
         }
 
@@ -141,6 +145,11 @@ public class InMemoryTaskManager implements TaskManager {
     public void createEpic(Epic epic) {
         if (isEpicExist(epicMap.get(epic.getId()))) {
             System.out.println("Такой эпик " + epic + " уже поставлен");
+            return;
+        }
+
+        if (isTaskIntersectToAllTaskToTime(epic)) {
+            System.out.println("Эпик " + epic + " пересекается по времени с другими задачами из списка");
             return;
         }
 
@@ -161,6 +170,11 @@ public class InMemoryTaskManager implements TaskManager {
     public void createSubTask(SubTask subTask) {
         if (isSubTaskExist(subTaskMap.get(subTask.getId()))) {
             System.out.println("Такая подзадача " + subTask + " уже поставлена");
+            return;
+        }
+
+        if (isTaskIntersectToAllTaskToTime(subTask)) {
+            System.out.println("Подзадача " + subTask + " пересекается по времени с другими задачами из списка");
             return;
         }
 
@@ -210,6 +224,11 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
 
+        if (isTaskIntersectToAllTaskToTime(task)) {
+            System.out.println("Задача " + task + " пересекается по времени с другими задачами из списка");
+            return;
+        }
+
         System.out.println("Задача обновлена");
         taskMap.put(task.getId(), task);
     }
@@ -218,6 +237,11 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateEpic(Epic epic) {
         if (!isEpicExist(epicMap.get(epic.getId()))) {
             System.out.println("Такого эпика " + epic + "нет в списках");
+            return;
+        }
+
+        if (isTaskIntersectToAllTaskToTime(epic)) {
+            System.out.println("Эпик " + epic + " пересекается по времени с другими задачами из списка");
             return;
         }
 
@@ -234,6 +258,11 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateSubTask(SubTask subTask) {
         if (!isSubTaskExist(subTaskMap.get(subTask.getId()))) {
             System.out.println("Такой подзадачи '" + subTask.getName() + "' нет в списках");
+            return;
+        }
+
+        if (isTaskIntersectToAllTaskToTime(subTask)) {
+            System.out.println("Подзадача " + subTask + " пересекается по времени с другими задачами из списка");
             return;
         }
 
@@ -322,6 +351,38 @@ public class InMemoryTaskManager implements TaskManager {
         }
 
         return subTaskListByEpic;
+    }
+
+    public TreeSet<Task> getPrioritizedTasks() {
+        final Comparator<Task> taskComparator = new Comparator<Task>() {
+            @Override
+            public int compare(Task o1, Task o2) {
+                int timeComparison = o1.getStartTime().compareTo(o2.getStartTime());
+                if (timeComparison != 0) {
+                    return timeComparison;
+                }
+
+                return Integer.compare(o1.getId(), o2.getId());
+            }
+        };
+
+        ArrayList<Task> allTasksList = new ArrayList<>();
+        allTasksList.addAll(getAllTaskList());
+        allTasksList.addAll(getAllEpicList());
+        allTasksList.addAll(getAllSubTaskList());
+
+        TreeSet<Task> sortedAllObjectTask = new TreeSet<>(taskComparator);
+        sortedAllObjectTask.addAll(allTasksList);
+
+        return sortedAllObjectTask;
+    }
+
+    public boolean isTasksIntersectToTime(Task t1, Task t2) {
+        return t1.getStartTime().isBefore(t2.getEndTime()) && t2.getStartTime().isBefore(t1.getEndTime());
+    }
+
+    public boolean isTaskIntersectToAllTaskToTime(Task newTask) {
+        return getPrioritizedTasks().stream().anyMatch((task) -> isTasksIntersectToTime(newTask, task));
     }
 
     @Override

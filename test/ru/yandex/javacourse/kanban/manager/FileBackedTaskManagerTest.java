@@ -18,7 +18,6 @@ import java.nio.file.Files;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -283,6 +282,176 @@ public class FileBackedTaskManagerTest {
         assertEquals(trueOrderTaskList, true2OrderTaskList,
                 "Списки должны быть эквивалентны");
 
+    }
+
+    @DisplayName("Проверка пересечения задач")
+    @Test
+    void get_isIntersect_TasksToTime() {
+        //given
+        Task newTask = new Task("Первая задача", "Описание первой задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
+        Task newTask1 = new Task("Первая задача", "Описание первой задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW,
+                Duration.of(28, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
+
+        //when
+        fileBackedTaskManager.createTask(newTask);
+        fileBackedTaskManager.createTask(newTask1);
+
+        //then
+        assertTrue(fileBackedTaskManager.isTasksIntersectToTime(newTask, newTask1), "Время выполнение заявок должно пересекаться");
+    }
+
+    @DisplayName("Проверка параллельности задач")
+    @Test
+    void get_isNotIntersect_TasksToTime() {
+        //given
+        Task newTask = new Task("Первая задача", "Описание первой задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
+        Task newTask1 = new Task("Первая задача", "Описание первой задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW,
+                Duration.of(28, ChronoUnit.MINUTES),
+                LocalDateTime.of(2024, 12, 1, 1, 1));
+
+        //when
+        fileBackedTaskManager.createTask(newTask);
+        fileBackedTaskManager.createTask(newTask1);
+
+        //then
+        assertFalse(fileBackedTaskManager.isTasksIntersectToTime(newTask, newTask1), "Время выполнение заявок не должно пересекаться");
+    }
+
+    @DisplayName("Проверка задач на пересечение в списках с задачами")
+    @Test
+    void get_isNewTask_IntersectToAllTasks()  {
+        //given
+        Task newTask = new Task("Первая задача", "Описание первой задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
+
+        Epic newEpic = new Epic("Первый эпик", "Описание первого Эпика",
+                inMemoryTaskManager.getNewId());
+
+        SubTask newSubTask = new SubTask("Первая подзадача", "Описание первой подзадачи",
+                inMemoryTaskManager.getNewId(), TaskStatus.IN_PROGRESS, newEpic.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2024, 11, 1, 1, 1));
+
+        SubTask newSubTask1 = new SubTask("Вторая подзадача", "Описание второй подзадачи",
+                inMemoryTaskManager.getNewId(), TaskStatus.NEW, newEpic.getId(),
+                Duration.of(40, ChronoUnit.MINUTES),
+                LocalDateTime.of(2023, 10, 1, 1, 1));
+
+        SubTask newSubTask2 = new SubTask("Вторая подзадача(Копия)", "Описание второй подзадачи(копия)",
+                inMemoryTaskManager.getNewId(), TaskStatus.NEW, newEpic.getId(),
+                Duration.of(40, ChronoUnit.MINUTES),
+                LocalDateTime.of(2023, 10, 1, 1, 1));
+
+        //when
+        fileBackedTaskManager.createTask(newTask);
+        fileBackedTaskManager.createEpic(newEpic);
+        fileBackedTaskManager.createSubTask(newSubTask);
+        fileBackedTaskManager.createSubTask(newSubTask1);
+
+        boolean isNewTaskIntersectToExistTasks = fileBackedTaskManager.isTaskIntersectToAllTaskToTime(newSubTask2);
+
+        //then
+        assertTrue(isNewTaskIntersectToExistTasks,
+                "Пересечение существует");
+
+    }
+
+    @DisplayName("Проверка задач на не пересечение в списках с задачами")
+    @Test
+    void get_isNewTask_NotIntersectToAllTasks()  {
+        //given
+        Task newTask = new Task("Первая задача", "Описание первой задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
+
+        Epic newEpic = new Epic("Первый эпик", "Описание первого Эпика",
+                inMemoryTaskManager.getNewId());
+
+        SubTask newSubTask = new SubTask("Первая подзадача", "Описание первой подзадачи",
+                inMemoryTaskManager.getNewId(), TaskStatus.IN_PROGRESS, newEpic.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2024, 11, 1, 1, 1));
+
+        SubTask newSubTask1 = new SubTask("Вторая подзадача", "Описание второй подзадачи",
+                inMemoryTaskManager.getNewId(), TaskStatus.NEW, newEpic.getId(),
+                Duration.of(40, ChronoUnit.MINUTES),
+                LocalDateTime.of(2023, 10, 1, 1, 1));
+
+        SubTask newSubTask2 = new SubTask("Вторая подзадача(Копия)", "Описание второй подзадачи(копия)",
+                inMemoryTaskManager.getNewId(), TaskStatus.NEW, newEpic.getId(),
+                Duration.of(40, ChronoUnit.MINUTES),
+                LocalDateTime.of(2026, 10, 1, 1, 1));
+
+        //when
+        fileBackedTaskManager.createTask(newTask);
+        fileBackedTaskManager.createEpic(newEpic);
+        fileBackedTaskManager.createSubTask(newSubTask);
+        fileBackedTaskManager.createSubTask(newSubTask1);
+
+        boolean isNewTaskNotIntersectToExistTasks = fileBackedTaskManager.isTaskIntersectToAllTaskToTime(newSubTask2);
+
+        //then
+        assertFalse(isNewTaskNotIntersectToExistTasks,
+                "Задача не должна пересекать другие");
+
+    }
+
+    @DisplayName("Попытка добавить подзадачу с пересечением по времени")
+    @Test
+    void add_NewSubTask_ToIntersectToAllTasks()  {
+        //given
+        Task newTask = new Task("Первая задача", "Описание первой задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
+
+        Epic newEpic = new Epic("Первый эпик", "Описание первого Эпика",
+                inMemoryTaskManager.getNewId());
+
+        SubTask newSubTask = new SubTask("Первая подзадача", "Описание первой подзадачи",
+                inMemoryTaskManager.getNewId(), TaskStatus.IN_PROGRESS, newEpic.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2024, 11, 1, 1, 1));
+
+        SubTask newSubTask1 = new SubTask("Вторая подзадача", "Описание второй подзадачи",
+                inMemoryTaskManager.getNewId(), TaskStatus.NEW, newEpic.getId(),
+                Duration.of(40, ChronoUnit.MINUTES),
+                LocalDateTime.of(2023, 10, 1, 1, 1));
+
+        SubTask newSubTask2 = new SubTask("Вторая подзадача(Копия)", "Описание второй подзадачи(копия)",
+                inMemoryTaskManager.getNewId(), TaskStatus.NEW, newEpic.getId(),
+                Duration.of(40, ChronoUnit.MINUTES),
+                LocalDateTime.of(2023, 10, 1, 1, 1));
+
+        //when
+        fileBackedTaskManager.createTask(newTask);
+        fileBackedTaskManager.createEpic(newEpic);
+        fileBackedTaskManager.createSubTask(newSubTask);
+        fileBackedTaskManager.createSubTask(newSubTask1);
+
+        fileBackedTaskManager.createSubTask(newSubTask2);
+
+        //then
+        assertNull(fileBackedTaskManager.getSubTaskById(newSubTask2.getId()));
     }
 
 }
