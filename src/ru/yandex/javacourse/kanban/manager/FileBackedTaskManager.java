@@ -11,9 +11,13 @@ import ru.yandex.javacourse.kanban.task.TaskStatus;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static ru.yandex.javacourse.kanban.Stubs.FORMATTER;
 import static ru.yandex.javacourse.kanban.manager.TaskType.*;
 
 public class FileBackedTaskManager extends InMemoryTaskManager implements TaskManager {
@@ -48,7 +52,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             while (bufferedReader.ready()) {
                 String line = bufferedReader.readLine();
-                if (line.contains("id,type,name,status,description,epic")) continue;
+                if (line.contains("id,type,name,status,description,epic,duration,startTime,endTime")) continue;
 
                 if (line.contains("TASK") && !line.contains("SUBTASK")) {
                     fileBackedTaskManager.createTask(fromString(line));
@@ -75,7 +79,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         allTasksList.addAll(getAllSubTaskList());
 
         try (Writer fileWriter = new FileWriter(path.toFile())) {
-            fileWriter.write("id,type,name,status,description,epic\n");
+            fileWriter.write("id,type,name,status,description,epic,duration,startTime,endTime\n");
+
             for (Task t : allTasksList) {
                 fileWriter.write(toString(t) + "\n");
             }
@@ -209,16 +214,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         return super.getAllSubTaskByEpic(epic);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
-
     String toString(Task task) throws InvalidTaskTypeException {
         StringBuilder builder = new StringBuilder();
 
@@ -231,7 +226,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                     .append(",")
                     .append(task.getStatus())
                     .append(",")
-                    .append(task.getDescription());
+                    .append(task.getDescription())
+                    .append(",")
+                    .append(task.getDuration().toMinutes())
+                    .append(",")
+                    .append(task.getStartTime().format(FORMATTER));
+
             case EPIC -> {
                 Epic epic = (Epic) task;
                 builder.append(epic.getId())
@@ -242,7 +242,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                         .append(",")
                         .append(epic.getStatus())
                         .append(",")
-                        .append(epic.getDescription());
+                        .append(epic.getDescription())
+                        .append(",")
+                        .append(epic.getDuration().toMinutes())
+                        .append(",")
+                        .append(epic.getStartTime().format(FORMATTER))
+                        .append(",")
+                        .append(epic.getEndTime().format(FORMATTER));
             }
             case SUBTASK -> {
                 SubTask subTask = (SubTask) task;
@@ -256,8 +262,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                         .append(",")
                         .append(subTask.getDescription())
                         .append(",")
-                        .append(subTask.getEpicId());
-
+                        .append(subTask.getEpicId())
+                        .append(",")
+                        .append(subTask.getDuration().toMinutes())
+                        .append(",")
+                        .append(subTask.getStartTime().format(FORMATTER));
             }
             default -> throw new InvalidTaskTypeException("Такова типа задач нет!");
         }
@@ -267,23 +276,29 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
     public static Task fromString(String value) throws InvalidTaskTypeException {
         List<String> tempStringTaskList = new ArrayList<>(List.of(value.split(",")));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy MM dd HH mm");
 
         String name = tempStringTaskList.get(2);
         String description = tempStringTaskList.get(4);
         int id = Integer.parseInt(tempStringTaskList.get(0));
 
+
         switch (TaskType.valueOf(tempStringTaskList.get(1))) {
             case TASK -> {
                 TaskStatus status = TaskStatus.valueOf(tempStringTaskList.get(3));
-                return new Task(name, description, id, status);
+                Duration duration = Duration.ofMinutes(Long.parseLong(tempStringTaskList.get(5)));
+                LocalDateTime startTime = LocalDateTime.parse(tempStringTaskList.get(6), formatter);
+                return new Task(name, description, id, status, duration, startTime);
             }
             case EPIC -> {
                 return new Epic(name, description, id);
             }
             case SUBTASK -> {
                 TaskStatus status = TaskStatus.valueOf(tempStringTaskList.get(3));
+                Duration duration = Duration.ofMinutes(Long.parseLong(tempStringTaskList.get(6)));
                 int epicId = Integer.parseInt(tempStringTaskList.get(5));
-                return new SubTask(name, description, id, status, epicId);
+                LocalDateTime startTime = LocalDateTime.parse(tempStringTaskList.get(7), formatter);
+                return new SubTask(name, description, id, status, epicId, duration, startTime);
             }
             default -> throw new InvalidTaskTypeException("Такова типа задач нет!");
         }

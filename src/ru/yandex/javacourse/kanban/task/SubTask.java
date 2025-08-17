@@ -1,12 +1,15 @@
 package ru.yandex.javacourse.kanban.task;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class SubTask extends Task {
     private final int epicId;
 
-    public SubTask(String name, String description, int taskId, TaskStatus status, int epicId) {
-        super(name, description, taskId, status);
+    public SubTask(String name, String description, int taskId, TaskStatus status, int epicId,
+                   Duration duration, LocalDateTime startTime) {
+        super(name, description, taskId, status, duration, startTime);
         this.epicId = epicId;
     }
 
@@ -18,13 +21,14 @@ public class SubTask extends Task {
     public String toString() {
         return "SubTask{" +
                 "name='" + getName() + '\'' +
-                ", description='" + getDescription() + '\'' +
-                ", id=" + getId() +
-                ", status=" + getStatus() +
+                ", Description='" + getDescription() + '\'' +
+                ", Id=" + getId() +
+                ", Status=" + getStatus() +
                 ", EpicId=" + getEpicId() +
+                ", Duration=" + getDuration() +
+                ", StartTime=" + getStartTime() +
                 '}';
     }
-
 
     @Override
     public boolean equals(Object o) {

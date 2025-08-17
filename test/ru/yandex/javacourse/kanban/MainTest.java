@@ -7,6 +7,9 @@ import ru.yandex.javacourse.kanban.task.SubTask;
 import ru.yandex.javacourse.kanban.task.Task;
 import ru.yandex.javacourse.kanban.task.TaskStatus;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -19,22 +22,30 @@ public class MainTest {
     @BeforeEach
     void beforeEach() {
         Task firstTask = new Task("Первая задача", "Описание первой задачи", taskManager.getNewId(),
-                TaskStatus.NEW);
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
         taskManager.createTask(firstTask);
 
         Epic firstEpic = new Epic("Первый эпик", "Описание первого Эпика", taskManager.getNewId());
         taskManager.createEpic(firstEpic);
 
         SubTask firstSubTask = new SubTask("Первая подзадача", "Описание первой подзадачи",
-                taskManager.getNewId(), TaskStatus.DONE, firstEpic.getId());
+                taskManager.getNewId(), TaskStatus.DONE, firstEpic.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 9, 1, 1, 1));
         SubTask secondSubTask = new SubTask("Вторая подзадача", "Описание второй подзадачи",
-                taskManager.getNewId(), TaskStatus.IN_PROGRESS, firstEpic.getId());
+                taskManager.getNewId(), TaskStatus.IN_PROGRESS, firstEpic.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 10, 2, 1, 1));
 
         taskManager.createSubTask(firstSubTask);
         taskManager.createSubTask(secondSubTask);
 
         Task task2 = new Task("Первая задача", "Описание первой задачи", taskManager.getNewId(),
-                TaskStatus.NEW);
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 11, 1, 1, 1));
         taskManager.createTask(task2);
 
     }
@@ -183,9 +194,13 @@ public class MainTest {
         //given
         int idEqualTask = 8;
         Task firstEqualTask = new Task("Тестовая1", "Тест1", idEqualTask,
-                TaskStatus.NEW);
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 7, 1, 1, 1));
         Task secondEqualTask = new Task("Тестовая2", "Тест2", idEqualTask,
-                TaskStatus.NEW);
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 8, 1, 1, 1));
 
         //when
         taskManager.createTask(firstEqualTask);
@@ -219,8 +234,14 @@ public class MainTest {
         //given
         int idEqualSubTask = 8;
         int idEpic = 1;
-        SubTask firstEqualSubTask = new SubTask("Тестовая1", "Тест1", idEqualSubTask, TaskStatus.NEW, idEpic);
-        SubTask secondEqualSubTask = new SubTask("Тестовая2", "Тест2", idEqualSubTask, TaskStatus.NEW, idEpic);
+        SubTask firstEqualSubTask = new SubTask("Тестовая1", "Тест1", idEqualSubTask, TaskStatus.NEW,
+                idEpic,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 7, 1, 1, 1));
+        SubTask secondEqualSubTask = new SubTask("Тестовая2", "Тест2", idEqualSubTask, TaskStatus.NEW,
+                idEpic,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 8, 1, 1, 1));
 
         //when
         taskManager.createSubTask(firstEqualSubTask);
@@ -237,9 +258,13 @@ public class MainTest {
         //given
         int taskId = 7;
         Task testTask = new Task("Тестовая1", "Тест1", taskId,
-                TaskStatus.NEW);
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 7, 1, 1, 1));
         Task testTaskUpdated = new Task("Изменена", "Тест1", taskId,
-                TaskStatus.NEW);
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 8, 1, 1, 1));
 
         //when
         taskManager.createTask(testTask);
@@ -281,8 +306,12 @@ public class MainTest {
         //given
         int subTaskId = 7;
         int epicId = 1;
-        SubTask testSubTask = new SubTask("Тестовая1", "Тест1", subTaskId, TaskStatus.NEW, epicId);
-        SubTask testSubTaskUpdated = new SubTask("Изменена", "Тест1", subTaskId, TaskStatus.NEW, epicId);
+        SubTask testSubTask = new SubTask("Тестовая1", "Тест1", subTaskId, TaskStatus.NEW, epicId,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 8, 1, 1, 1));
+        SubTask testSubTaskUpdated = new SubTask("Изменена", "Тест1", subTaskId, TaskStatus.NEW, epicId,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 7, 1, 1, 1));
 
         //when
         taskManager.createSubTask(testSubTask);
@@ -305,7 +334,9 @@ public class MainTest {
         int taskId = 0;
         ArrayList<Task> testedTasksList = new ArrayList<>();
         Task testTask = taskManager.getTaskById(taskId);
-        Task updatedTask = new Task("Тестовая", "Описание первой задачи", taskId, TaskStatus.NEW);
+        Task updatedTask = new Task("Тестовая", "Описание первой задачи", taskId, TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
 
         //when
         testedTasksList.add(testTask);
@@ -350,7 +381,9 @@ public class MainTest {
         int epicId = 1;
         ArrayList<SubTask> testedSubTaskList = new ArrayList<>();
         SubTask testSubTask = taskManager.getSubTaskById(subTaskId);
-        SubTask updatedSubTask = new SubTask("Тестовая1", "Тест1", subTaskId, TaskStatus.NEW, epicId);
+        SubTask updatedSubTask = new SubTask("Тестовая1", "Тест1", subTaskId, TaskStatus.NEW, epicId,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
 
         //when
         testedSubTaskList.add(testSubTask);

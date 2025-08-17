@@ -7,6 +7,10 @@ import ru.yandex.javacourse.kanban.task.Epic;
 import ru.yandex.javacourse.kanban.task.Task;
 import ru.yandex.javacourse.kanban.task.TaskStatus;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class InMemoryHistoryManagerTest {
@@ -37,7 +41,9 @@ public class InMemoryHistoryManagerTest {
         int realHistorySize = 1;
         Task newTask = new Task("Первая задача", "Описание первой задачи",
                 inMemoryTaskManager.getNewId(),
-                TaskStatus.NEW);
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
 
         //when
         inMemoryHistoryManager.add(newTask);
@@ -67,7 +73,10 @@ public class InMemoryHistoryManagerTest {
         int realSizeHistory = 2;
         Task newTask = new Task("Первая задача", "Описание первой задачи",
                 inMemoryTaskManager.getNewId(),
-                TaskStatus.NEW);
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
+
         Epic newEpic = new Epic("Первый эпик", "Описание первого Эпика", inMemoryTaskManager.getNewId());
 
         //when
@@ -85,11 +94,16 @@ public class InMemoryHistoryManagerTest {
         int realSizeHistory = 3;
         Task newTask = new Task("Первая задача", "Описание первой задачи",
                 inMemoryTaskManager.getNewId(),
-                TaskStatus.NEW);
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
+
         Epic newEpic = new Epic("Первый эпик", "Описание первого Эпика", inMemoryTaskManager.getNewId());
         Task newTask2 = new Task("Вторая задача", "Описание второй задачи",
                 inMemoryTaskManager.getNewId(),
-                TaskStatus.NEW);
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
 
         //when
         inMemoryHistoryManager.add(newTask);

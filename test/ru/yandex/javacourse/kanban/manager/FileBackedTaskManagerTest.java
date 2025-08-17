@@ -5,19 +5,24 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.yandex.javacourse.kanban.manager.exception.InvalidTaskTypeException;
-import ru.yandex.javacourse.kanban.task.Epic;
-import ru.yandex.javacourse.kanban.task.SubTask;
-import ru.yandex.javacourse.kanban.task.Task;
-import ru.yandex.javacourse.kanban.task.TaskStatus;
+import ru.yandex.javacourse.kanban.manager.exception.ManagerReadException;
+import ru.yandex.javacourse.kanban.manager.exception.ManagerSaveException;
+import ru.yandex.javacourse.kanban.task.*;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Files;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.LinkedList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static ru.yandex.javacourse.kanban.manager.Stubs.FILE_HEADER;
+import static ru.yandex.javacourse.kanban.manager.Stubs.FORMATTER;
 
 public class FileBackedTaskManagerTest {
     public static FileBackedTaskManager fileBackedTaskManager;
@@ -43,13 +48,15 @@ public class FileBackedTaskManagerTest {
         //given
         Task newTask = new Task("Первая задача", "Описание первой задачи",
                 inMemoryTaskManager.getNewId(),
-                TaskStatus.NEW);
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
 
         //when
         String taskToString = fileBackedTaskManager.toString(newTask);
 
         //then
-        assertEquals(("0,TASK,Первая задача,NEW,Описание первой задачи"), taskToString,
+        assertEquals(("0,TASK,Первая задача,NEW,Описание первой задачи,30,2025 12 01 01 01"), taskToString,
                 "Текстовое описание должно быть эквивалентно");
     }
 
@@ -64,7 +71,9 @@ public class FileBackedTaskManagerTest {
         String epicToString = fileBackedTaskManager.toString(newEpic);
 
         //then
-        assertEquals(("0,EPIC,Первый эпик,NEW,Описание первого Эпика"), epicToString,
+        assertEquals(("0,EPIC,Первый эпик,NEW,Описание первого Эпика,0,"
+                        + LocalDateTime.now().format(FORMATTER) + ","
+                        + LocalDateTime.now().format(FORMATTER)), epicToString,
                 "Текстовое описание должно быть эквивалентно");
     }
 
@@ -75,13 +84,16 @@ public class FileBackedTaskManagerTest {
         Epic newEpic = new Epic("Первый эпик", "Описание первого Эпика",
                 inMemoryTaskManager.getNewId());
         SubTask newSubTask = new SubTask("Вторая подзадача", "Описание второй подзадачи",
-                inMemoryTaskManager.getNewId(), TaskStatus.IN_PROGRESS, newEpic.getId());
+                inMemoryTaskManager.getNewId(), TaskStatus.IN_PROGRESS, newEpic.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
 
         //when
         String subTaskToString = fileBackedTaskManager.toString(newSubTask);
 
         //then
-        assertEquals(("1,SUBTASK,Вторая подзадача,IN_PROGRESS,Описание второй подзадачи,0"), subTaskToString,
+        assertEquals(("1,SUBTASK,Вторая подзадача,IN_PROGRESS,Описание второй подзадачи,0,30,2025 12 01 01 01"),
+                subTaskToString,
                 "Текстовое описание должно быть эквивалентно");
     }
 
@@ -91,7 +103,9 @@ public class FileBackedTaskManagerTest {
         //given
         Task newTask = new Task("Первая задача", "Описание первой задачи",
                 inMemoryTaskManager.getNewId(),
-                TaskStatus.NEW);
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
 
         //when
         String taskToString = fileBackedTaskManager.toString(newTask);
@@ -123,7 +137,9 @@ public class FileBackedTaskManagerTest {
         Epic newEpic = new Epic("Первый эпик", "Описание первого Эпика",
                 inMemoryTaskManager.getNewId());
         SubTask newSubTask = new SubTask("Вторая подзадача", "Описание второй подзадачи",
-                inMemoryTaskManager.getNewId(), TaskStatus.IN_PROGRESS, newEpic.getId());
+                inMemoryTaskManager.getNewId(), TaskStatus.IN_PROGRESS, newEpic.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
 
         //when
         String subTaskToString = fileBackedTaskManager.toString(newSubTask);
@@ -133,11 +149,54 @@ public class FileBackedTaskManagerTest {
         assertEquals(restoredSubTask, newSubTask, "Подзадачи должны быть эквиваленты");
     }
 
+    @DisplayName("Проверка срабатывания исключения IllegalArgumentException")
+    @Test
+    void get_Get_IllegalArgumentException() {
+        //given
+
+        TestTaskTest newTaskTest = new TestTaskTest("Первая задача", "Описание первой задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
+
+        //then
+        assertThrows(IllegalArgumentException.class, () -> {
+            fileBackedTaskManager.createTask(newTaskTest);
+        }, "Такой тип задачи не добавлен TaskType - должно быть исключение ");
+    }
+
+    @DisplayName("Проверка срабатывания исключения ManagerSaveException")
+    @Test
+    void get_Get_ManagerSaveException() {
+
+        //when
+        tempFile.setReadOnly();
+
+        //then
+        assertThrows(ManagerSaveException.class, () -> {
+            FileBackedTaskManager.loadFromFile(tempFile);
+        }, "Сохранение в данный файл невозможно");
+    }
+
+    @DisplayName("Проверка срабатывания исключения ManagerReadException")
+    @Test
+    void get_Get_ManagerReadException() {
+
+        //when
+        tempFile.setReadable(false, true);
+
+        //then
+        assertThrows(ManagerReadException.class, () -> {
+            FileBackedTaskManager.loadFromFile(tempFile);
+        }, "Чтение данного файла невозможно");
+    }
+
     @DisplayName("Проверка сохранения пустого файл")
     @Test
     void add_isSaved_EmptyFileToDisk() throws IOException {
         //given
-        String fileHeader = "id,type,name,status,description,epic";
+        String fileHeader = "id,type,name,status,description,epic,duration,startTime,endTime";
 
         //when
         fileBackedTaskManager.save();
@@ -165,11 +224,15 @@ public class FileBackedTaskManagerTest {
         //given
         Task newTask = new Task("Первая задача", "Описание первой задачи",
                 inMemoryTaskManager.getNewId(),
-                TaskStatus.NEW);
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
         Epic newEpic = new Epic("Первый эпик", "Описание первого Эпика",
                 inMemoryTaskManager.getNewId());
         SubTask newSubTask = new SubTask("Вторая подзадача", "Описание второй подзадачи",
-                inMemoryTaskManager.getNewId(), TaskStatus.IN_PROGRESS, newEpic.getId());
+                inMemoryTaskManager.getNewId(), TaskStatus.IN_PROGRESS, newEpic.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 11, 1, 1, 1));
 
         //when
         fileBackedTaskManager.createTask(newTask);
@@ -188,17 +251,23 @@ public class FileBackedTaskManagerTest {
                 "Строки должны быть эквивалентны");
     }
 
-    @DisplayName("Проверка загрузки задач в при перезапуске программы")
+    @DisplayName("Проверка загрузки задач при перезапуске программы")
     @Test
     void add_isImport_FromStringToProgram() throws IOException, InvalidTaskTypeException {
         //given
         Task newTask = new Task("Первая задача", "Описание первой задачи",
                 inMemoryTaskManager.getNewId(),
-                TaskStatus.NEW);
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
+
         Epic newEpic = new Epic("Первый эпик", "Описание первого Эпика",
                 inMemoryTaskManager.getNewId());
+
         SubTask newSubTask = new SubTask("Вторая подзадача", "Описание второй подзадачи",
-                inMemoryTaskManager.getNewId(), TaskStatus.IN_PROGRESS, newEpic.getId());
+                inMemoryTaskManager.getNewId(), TaskStatus.IN_PROGRESS, newEpic.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2024, 12, 1, 1, 1));
 
         Writer fileWriter = new FileWriter(tempFile, true);
         fileWriter.write(FILE_HEADER + "\n");
@@ -208,7 +277,6 @@ public class FileBackedTaskManagerTest {
         fileWriter.close();
 
         //when
-
         FileBackedTaskManager fileBackedTaskManager1 = FileBackedTaskManager.loadFromFile(tempFile);
 
         //then
@@ -219,4 +287,323 @@ public class FileBackedTaskManagerTest {
         assertEquals(newSubTask, fileBackedTaskManager1.getSubTaskById(2),
                 "Подзадачи должны быть эквивалентны");
     }
+
+    @DisplayName("Вывод отсортированного списка всех задач")
+    @Test
+    void get_GetAllSortedTasksObject_FromAllList() {
+        //given
+        Task newTask = new Task("Первая задача", "Описание первой задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
+
+        Epic newEpic = new Epic("Первый эпик", "Описание первого Эпика",
+                inMemoryTaskManager.getNewId());
+
+        SubTask newSubTask = new SubTask("Первая подзадача", "Описание первой подзадачи",
+                inMemoryTaskManager.getNewId(), TaskStatus.IN_PROGRESS, newEpic.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2024, 11, 1, 1, 1));
+
+        SubTask newSubTask1 = new SubTask("Вторая подзадача", "Описание второй подзадачи",
+                inMemoryTaskManager.getNewId(), TaskStatus.NEW, newEpic.getId(),
+                Duration.of(40, ChronoUnit.MINUTES),
+                LocalDateTime.of(2023, 10, 1, 1, 1));
+
+        //when
+        fileBackedTaskManager.createTask(newTask);
+        fileBackedTaskManager.createEpic(newEpic);
+        fileBackedTaskManager.createSubTask(newSubTask);
+        fileBackedTaskManager.createSubTask(newSubTask1);
+
+        LinkedList<Task> trueOrderTaskList = new LinkedList<>(List.of(newSubTask1, newSubTask, newEpic, newTask));
+        LinkedList<Task> true2OrderTaskList = new LinkedList<>(List.copyOf(fileBackedTaskManager.getPrioritizedTasks()));
+
+        //then
+        assertEquals(trueOrderTaskList, true2OrderTaskList,
+                "Списки должны быть эквивалентны");
+
+    }
+
+    @DisplayName("Проверка правильного формирования списка приоритетных задач")
+    @Test
+    void get_GetTrueSortedTasksObject_FromAllList() {
+        //given
+        Task newTask = new Task("Первая задача", "Описание первой задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
+
+        Task newTask1 = new Task("Вторая задача", "Описание второй задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2024, 12, 1, 1, 1));
+
+
+        //when
+
+        fileBackedTaskManager.createTask(newTask);
+
+        LinkedList<Task> trueOrderTaskList = new LinkedList<>(List.of(newTask));
+        LinkedList<Task> true2OrderTaskList = new LinkedList<>(
+                List.copyOf(fileBackedTaskManager.getPrioritizedTasks()));
+
+        assertEquals(trueOrderTaskList, true2OrderTaskList,
+                "Списки должны быть эквивалентны");
+
+        fileBackedTaskManager.createTask(newTask1);
+
+        trueOrderTaskList = new LinkedList<>(List.of(newTask1, newTask));
+        true2OrderTaskList = new LinkedList<>(List.copyOf(fileBackedTaskManager.getPrioritizedTasks()));
+
+        assertEquals(trueOrderTaskList, true2OrderTaskList,
+                "Списки должны быть эквивалентны");
+
+        //then
+
+    }
+
+    @DisplayName("Проверка правильного формирования списка приоритетных задач при удаление задачи")
+    @Test
+    void get_GetTrueSortedTasksObject_ByRemoveTask() {
+        //given
+        Task newTask = new Task("Первая задача", "Описание первой задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
+
+        Task newTask1 = new Task("Вторая задача", "Описание второй задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2024, 12, 1, 1, 1));
+
+        //then
+
+        fileBackedTaskManager.createTask(newTask);
+        fileBackedTaskManager.createTask(newTask1);
+
+        fileBackedTaskManager.removeTaskById(newTask1.getId());
+
+        LinkedList<Task> trueOrderTaskList = new LinkedList<>(List.of(newTask));
+        LinkedList<Task> true2OrderTaskList = new LinkedList<>(List.copyOf(fileBackedTaskManager.getPrioritizedTasks()));
+
+        assertEquals(trueOrderTaskList, true2OrderTaskList,
+                "Списки должны быть эквивалентны");
+
+    }
+
+    @DisplayName("Проверка правильного формирования списка приоритетных задач при обновлении задачи")
+    @Test
+    void get_GetTrueSortedTasksObject_ByUpdateTask() {
+        //given
+        Task newTask = new Task("Первая задача", "Описание первой задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
+
+        Task newTask1 = new Task("Вторая задача", "Описание второй задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2024, 12, 1, 1, 1));
+
+        //then
+
+        fileBackedTaskManager.createTask(newTask);
+        fileBackedTaskManager.createTask(newTask1);
+
+        Task updatedNewTask = new Task("Первая задача (обновлена)", "Описание первой задачи (обновлена)",
+                newTask.getId(),
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2023, 12, 1, 1, 1));
+
+        fileBackedTaskManager.updateTask(updatedNewTask);
+
+        LinkedList<Task> trueOrderTaskList = new LinkedList<>(List.of(updatedNewTask, newTask1));
+
+        LinkedList<Task> true2OrderTaskList = new LinkedList<>(List.copyOf(fileBackedTaskManager.getPrioritizedTasks()));
+
+        assertEquals(trueOrderTaskList, true2OrderTaskList,
+                "Списки должны быть эквивалентны");
+
+    }
+
+    @DisplayName("Проверка пересечения задач")
+    @Test
+    void get_isIntersect_TasksToTime() {
+        //given
+        Task newTask = new Task("Первая задача", "Описание первой задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
+        Task newTask1 = new Task("Первая задача", "Описание первой задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW,
+                Duration.of(28, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
+
+        //when
+        fileBackedTaskManager.createTask(newTask);
+        fileBackedTaskManager.createTask(newTask1);
+
+        //then
+        assertTrue(fileBackedTaskManager.isTasksIntersectToTime(newTask, newTask1),
+                "Время выполнение заявок должно пересекаться");
+    }
+
+    @DisplayName("Проверка параллельности задач")
+    @Test
+    void get_isNotIntersect_TasksToTime() {
+        //given
+        Task newTask = new Task("Первая задача", "Описание первой задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
+        Task newTask1 = new Task("Первая задача", "Описание первой задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW,
+                Duration.of(28, ChronoUnit.MINUTES),
+                LocalDateTime.of(2024, 12, 1, 1, 1));
+
+        //when
+        fileBackedTaskManager.createTask(newTask);
+        fileBackedTaskManager.createTask(newTask1);
+
+        //then
+        assertFalse(fileBackedTaskManager.isTasksIntersectToTime(newTask, newTask1), "Время выполнение заявок не должно пересекаться");
+    }
+
+    @DisplayName("Проверка задач на пересечение в списках с задачами")
+    @Test
+    void get_isNewTask_IntersectToAllTasks() {
+        //given
+        Task newTask = new Task("Первая задача", "Описание первой задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
+
+        Epic newEpic = new Epic("Первый эпик", "Описание первого Эпика",
+                inMemoryTaskManager.getNewId());
+
+        SubTask newSubTask = new SubTask("Первая подзадача", "Описание первой подзадачи",
+                inMemoryTaskManager.getNewId(), TaskStatus.IN_PROGRESS, newEpic.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2024, 11, 1, 1, 1));
+
+        SubTask newSubTask1 = new SubTask("Вторая подзадача", "Описание второй подзадачи",
+                inMemoryTaskManager.getNewId(), TaskStatus.NEW, newEpic.getId(),
+                Duration.of(40, ChronoUnit.MINUTES),
+                LocalDateTime.of(2023, 10, 1, 1, 1));
+
+        SubTask newSubTask2 = new SubTask("Вторая подзадача(Копия)", "Описание второй подзадачи(копия)",
+                inMemoryTaskManager.getNewId(), TaskStatus.NEW, newEpic.getId(),
+                Duration.of(40, ChronoUnit.MINUTES),
+                LocalDateTime.of(2023, 10, 1, 1, 1));
+
+        //when
+        fileBackedTaskManager.createTask(newTask);
+        fileBackedTaskManager.createEpic(newEpic);
+        fileBackedTaskManager.createSubTask(newSubTask);
+        fileBackedTaskManager.createSubTask(newSubTask1);
+
+        boolean isNewTaskIntersectToExistTasks = fileBackedTaskManager.isTaskIntersectToAllTaskToTime(newSubTask2);
+
+        //then
+        assertTrue(isNewTaskIntersectToExistTasks,
+                "Пересечение существует");
+
+    }
+
+    @DisplayName("Проверка задач на не пересечение в списках с задачами")
+    @Test
+    void get_isNewTask_NotIntersectToAllTasks() {
+        //given
+        Task newTask = new Task("Первая задача", "Описание первой задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
+
+        Epic newEpic = new Epic("Первый эпик", "Описание первого Эпика",
+                inMemoryTaskManager.getNewId());
+
+        SubTask newSubTask = new SubTask("Первая подзадача", "Описание первой подзадачи",
+                inMemoryTaskManager.getNewId(), TaskStatus.IN_PROGRESS, newEpic.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2024, 11, 1, 1, 1));
+
+        SubTask newSubTask1 = new SubTask("Вторая подзадача", "Описание второй подзадачи",
+                inMemoryTaskManager.getNewId(), TaskStatus.NEW, newEpic.getId(),
+                Duration.of(40, ChronoUnit.MINUTES),
+                LocalDateTime.of(2023, 10, 1, 1, 1));
+
+        SubTask newSubTask2 = new SubTask("Вторая подзадача(Копия)", "Описание второй подзадачи(копия)",
+                inMemoryTaskManager.getNewId(), TaskStatus.NEW, newEpic.getId(),
+                Duration.of(40, ChronoUnit.MINUTES),
+                LocalDateTime.of(2026, 10, 1, 1, 1));
+
+        //when
+        fileBackedTaskManager.createTask(newTask);
+        fileBackedTaskManager.createEpic(newEpic);
+        fileBackedTaskManager.createSubTask(newSubTask);
+        fileBackedTaskManager.createSubTask(newSubTask1);
+
+        boolean isNewTaskNotIntersectToExistTasks = fileBackedTaskManager.isTaskIntersectToAllTaskToTime(newSubTask2);
+
+        //then
+        assertFalse(isNewTaskNotIntersectToExistTasks,
+                "Задача не должна пересекать другие");
+
+    }
+
+    @DisplayName("Попытка добавить подзадачу с пересечением по времени")
+    @Test
+    void add_NewSubTask_ToIntersectToAllTasks() {
+        //given
+        Task newTask = new Task("Первая задача", "Описание первой задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
+
+        Epic newEpic = new Epic("Первый эпик", "Описание первого Эпика",
+                inMemoryTaskManager.getNewId());
+
+        SubTask newSubTask = new SubTask("Первая подзадача", "Описание первой подзадачи",
+                inMemoryTaskManager.getNewId(), TaskStatus.IN_PROGRESS, newEpic.getId(),
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2024, 11, 1, 1, 1));
+
+        SubTask newSubTask1 = new SubTask("Вторая подзадача", "Описание второй подзадачи",
+                inMemoryTaskManager.getNewId(), TaskStatus.NEW, newEpic.getId(),
+                Duration.of(40, ChronoUnit.MINUTES),
+                LocalDateTime.of(2023, 10, 1, 1, 1));
+
+        SubTask newSubTask2 = new SubTask("Вторая подзадача(Копия)", "Описание второй подзадачи(копия)",
+                inMemoryTaskManager.getNewId(), TaskStatus.NEW, newEpic.getId(),
+                Duration.of(40, ChronoUnit.MINUTES),
+                LocalDateTime.of(2023, 10, 1, 1, 1));
+
+        //when
+        fileBackedTaskManager.createTask(newTask);
+        fileBackedTaskManager.createEpic(newEpic);
+        fileBackedTaskManager.createSubTask(newSubTask);
+        fileBackedTaskManager.createSubTask(newSubTask1);
+
+        fileBackedTaskManager.createSubTask(newSubTask2);
+
+        //then
+        assertNull(fileBackedTaskManager.getSubTaskById(newSubTask2.getId()));
+    }
+
 }
