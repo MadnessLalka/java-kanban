@@ -12,7 +12,6 @@ public class Task {
     private Duration duration;
     private LocalDateTime startTime;
 
-
     public Task(String name, String description, int id, TaskStatus status, Duration duration, LocalDateTime startTime) {
         this.name = name;
         this.description = description;

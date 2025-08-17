@@ -317,10 +317,119 @@ public class FileBackedTaskManagerTest {
         fileBackedTaskManager.createSubTask(newSubTask);
         fileBackedTaskManager.createSubTask(newSubTask1);
 
-        LinkedList<Task> trueOrderTaskList = new LinkedList<>(List.of(newEpic, newSubTask1, newSubTask, newTask));
+        LinkedList<Task> trueOrderTaskList = new LinkedList<>(List.of(newSubTask1, newSubTask, newEpic, newTask));
         LinkedList<Task> true2OrderTaskList = new LinkedList<>(List.copyOf(fileBackedTaskManager.getPrioritizedTasks()));
 
         //then
+        assertEquals(trueOrderTaskList, true2OrderTaskList,
+                "Списки должны быть эквивалентны");
+
+    }
+
+    @DisplayName("Проверка правильного формирования списка приоритетных задач")
+    @Test
+    void get_GetTrueSortedTasksObject_FromAllList() {
+        //given
+        Task newTask = new Task("Первая задача", "Описание первой задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
+
+        Task newTask1 = new Task("Вторая задача", "Описание второй задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2024, 12, 1, 1, 1));
+
+
+        //when
+
+        fileBackedTaskManager.createTask(newTask);
+
+        LinkedList<Task> trueOrderTaskList = new LinkedList<>(List.of(newTask));
+        LinkedList<Task> true2OrderTaskList = new LinkedList<>(
+                List.copyOf(fileBackedTaskManager.getPrioritizedTasks()));
+
+        assertEquals(trueOrderTaskList, true2OrderTaskList,
+                "Списки должны быть эквивалентны");
+
+        fileBackedTaskManager.createTask(newTask1);
+
+        trueOrderTaskList = new LinkedList<>(List.of(newTask1, newTask));
+        true2OrderTaskList = new LinkedList<>(List.copyOf(fileBackedTaskManager.getPrioritizedTasks()));
+
+        assertEquals(trueOrderTaskList, true2OrderTaskList,
+                "Списки должны быть эквивалентны");
+
+        //then
+
+    }
+
+    @DisplayName("Проверка правильного формирования списка приоритетных задач при удаление задачи")
+    @Test
+    void get_GetTrueSortedTasksObject_ByRemoveTask() {
+        //given
+        Task newTask = new Task("Первая задача", "Описание первой задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
+
+        Task newTask1 = new Task("Вторая задача", "Описание второй задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2024, 12, 1, 1, 1));
+
+        //then
+
+        fileBackedTaskManager.createTask(newTask);
+        fileBackedTaskManager.createTask(newTask1);
+
+        fileBackedTaskManager.removeTaskById(newTask1.getId());
+
+        LinkedList<Task> trueOrderTaskList = new LinkedList<>(List.of(newTask));
+        LinkedList<Task> true2OrderTaskList = new LinkedList<>(List.copyOf(fileBackedTaskManager.getPrioritizedTasks()));
+
+        assertEquals(trueOrderTaskList, true2OrderTaskList,
+                "Списки должны быть эквивалентны");
+
+    }
+
+    @DisplayName("Проверка правильного формирования списка приоритетных задач при обновлении задачи")
+    @Test
+    void get_GetTrueSortedTasksObject_ByUpdateTask() {
+        //given
+        Task newTask = new Task("Первая задача", "Описание первой задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2025, 12, 1, 1, 1));
+
+        Task newTask1 = new Task("Вторая задача", "Описание второй задачи",
+                inMemoryTaskManager.getNewId(),
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2024, 12, 1, 1, 1));
+
+        //then
+
+        fileBackedTaskManager.createTask(newTask);
+        fileBackedTaskManager.createTask(newTask1);
+
+        Task updatedNewTask = new Task("Первая задача (обновлена)", "Описание первой задачи (обновлена)",
+                newTask.getId(),
+                TaskStatus.NEW,
+                Duration.of(30, ChronoUnit.MINUTES),
+                LocalDateTime.of(2023, 12, 1, 1, 1));
+
+        fileBackedTaskManager.updateTask(updatedNewTask);
+
+        LinkedList<Task> trueOrderTaskList = new LinkedList<>(List.of(updatedNewTask, newTask1));
+
+        LinkedList<Task> true2OrderTaskList = new LinkedList<>(List.copyOf(fileBackedTaskManager.getPrioritizedTasks()));
+
         assertEquals(trueOrderTaskList, true2OrderTaskList,
                 "Списки должны быть эквивалентны");
 
@@ -346,7 +455,8 @@ public class FileBackedTaskManagerTest {
         fileBackedTaskManager.createTask(newTask1);
 
         //then
-        assertTrue(fileBackedTaskManager.isTasksIntersectToTime(newTask, newTask1), "Время выполнение заявок должно пересекаться");
+        assertTrue(fileBackedTaskManager.isTasksIntersectToTime(newTask, newTask1),
+                "Время выполнение заявок должно пересекаться");
     }
 
     @DisplayName("Проверка параллельности задач")

@@ -1,6 +1,5 @@
 package ru.yandex.javacourse.kanban.task;
 
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
