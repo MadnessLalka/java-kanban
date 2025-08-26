@@ -12,11 +12,15 @@ import static ru.yandex.javacourse.kanban.manager.Stubs.PORT;
 public class HttpTaskServer {
 
     public static void main(String[] args) throws HttpServerCreateException {
+
+
         try {
+            TaskManager taskManager = Managers.getDefault();
+
             HttpServer httpServer = HttpServer.create();
             httpServer.bind(new InetSocketAddress(PORT), 0);
 
-            httpServer.createContext("/tasks", new TaskHandler());
+            httpServer.createContext("/tasks", new TaskHandler(taskManager));
             httpServer.createContext("/subtasks", new SubTaskHandler());
             httpServer.createContext("/epics", new EpicHandler());
             httpServer.createContext("/history", new HistoryHandler());
