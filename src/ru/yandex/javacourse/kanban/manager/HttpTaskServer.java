@@ -12,11 +12,9 @@ import static ru.yandex.javacourse.kanban.manager.Stubs.PORT;
 public class HttpTaskServer {
 
     public static void main(String[] args) throws HttpServerCreateException {
-
+        TaskManager taskManager = Managers.getDefault();
 
         try {
-            TaskManager taskManager = Managers.getDefault();
-
             HttpServer httpServer = HttpServer.create();
             httpServer.bind(new InetSocketAddress(PORT), 0);
 

@@ -1,5 +1,7 @@
 package ru.yandex.javacourse.kanban.manager;
 
+import ru.yandex.javacourse.kanban.manager.exception.IntersectionException;
+import ru.yandex.javacourse.kanban.manager.exception.NotFoundException;
 import ru.yandex.javacourse.kanban.task.Epic;
 import ru.yandex.javacourse.kanban.task.SubTask;
 import ru.yandex.javacourse.kanban.task.Task;
@@ -106,9 +108,10 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task getTaskById(int taskId) {
+    public Task getTaskById(int taskId) throws NotFoundException {
         if (!isTaskExist(taskMap.get(taskId))) {
             System.out.println("Задачи по id " + taskId + " - нет в списке");
+            throw new NotFoundException("Задачи по id " + taskId + " - нет в списке");
         }
 
         return taskMap.get(taskId);
@@ -118,6 +121,7 @@ public class InMemoryTaskManager implements TaskManager {
     public Epic getEpicById(int epicId) {
         if (!isEpicExist(epicMap.get(epicId))) {
             System.out.println("Эпика по такому id " + epicId + " нет");
+            throw new NotFoundException("Эпика по id " + epicId + " - нет в списке");
         }
 
         return epicMap.get(epicId);
@@ -127,6 +131,7 @@ public class InMemoryTaskManager implements TaskManager {
     public SubTask getSubTaskById(int subTaskId) {
         if (!isSubTaskExist(subTaskMap.get(subTaskId))) {
             System.out.println("Подзадачи по такому id " + subTaskId + " нет");
+            throw new NotFoundException("Подзадачи по id " + subTaskId + " - нет в списке");
         }
 
         return subTaskMap.get(subTaskId);
@@ -141,7 +146,7 @@ public class InMemoryTaskManager implements TaskManager {
 
         if (isTaskIntersectToAllTaskToTime(task)) {
             System.out.println("Задача " + task + " пересекается по времени с другими задачами из списка");
-            return;
+            throw new IntersectionException("Задача " + task.getId() + " пересекается по времени с другими задачами из списка");
         }
 
         taskMap.put(task.getId(), task);
@@ -162,7 +167,7 @@ public class InMemoryTaskManager implements TaskManager {
 
         if (isTaskIntersectToAllTaskToTime(epic)) {
             System.out.println("Эпик " + epic + " пересекаются по времени с другими задачами из списка");
-            return;
+            throw new IntersectionException("Эпик " + epic + " пересекается по времени с другими задачами из списка");
         }
 
         epic.setStatus();
@@ -188,7 +193,7 @@ public class InMemoryTaskManager implements TaskManager {
 
         if (isTaskIntersectToAllTaskToTime(subTask)) {
             System.out.println("Подзадача " + subTask + " пересекаются по времени с другими задачами из списка");
-            return;
+            throw new IntersectionException("Эпик " + subTask + " пересекается по времени с другими задачами из списка");
         }
 
         Epic currentEpic = getEpicById(subTask.getEpicId());
@@ -235,13 +240,13 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateTask(Task task) {
         if (!isTaskExist(taskMap.get(task.getId()))) {
             System.out.println("Такой задачи " + task + " нет в списках");
-            return;
+            throw new NotFoundException("Такой задачи " + task + " нет в списках");
         }
 
-        if (isTaskIntersectToAllTaskToTime(task)) {
-            System.out.println("Задача " + task + " пересекаются по времени с другими задачами из списка");
-            return;
-        }
+//        if (isTaskIntersectToAllTaskToTime(task)) {
+//            System.out.println("Задача " + task + " пересекаются по времени с другими задачами из списка");
+//            throw new IntersectionException("Задача " + task + " пересекаются по времени с другими задачами из списка");
+//        }
 
         System.out.println("Задача обновлена");
         prioritizedTasks.remove(taskMap.get(task.getId()));
@@ -253,13 +258,13 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateEpic(Epic epic) {
         if (!isEpicExist(epicMap.get(epic.getId()))) {
             System.out.println("Такого эпика " + epic + "нет в списках");
-            return;
+            throw new NotFoundException("Такого эпика " + epic + " нет в списках");
         }
 
-        if (isTaskIntersectToAllTaskToTime(epic)) {
-            System.out.println("Эпик " + epic + " пересекается по времени с другими задачами из списка");
-            return;
-        }
+//        if (isTaskIntersectToAllTaskToTime(epic)) {
+//            System.out.println("Эпик " + epic + " пересекается по времени с другими задачами из списка");
+//            throw new IntersectionException("Эпик " + epic + " пересекается по времени с другими задачами из списка");
+//        }
 
         epic.setStatus();
         epic.setDuration();
@@ -277,13 +282,13 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateSubTask(SubTask subTask) {
         if (!isSubTaskExist(subTaskMap.get(subTask.getId()))) {
             System.out.println("Такой подзадачи '" + subTask.getName() + "' нет в списках");
-            return;
+            throw new NotFoundException("Такой подзадачи '" + subTask.getName() + "' нет в списках");
         }
 
-        if (isTaskIntersectToAllTaskToTime(subTask)) {
-            System.out.println("Подзадача " + subTask + " пересекается по времени с другими задачами из списка");
-            return;
-        }
+//        if (isTaskIntersectToAllTaskToTime(subTask)) {
+//            System.out.println("Подзадача " + subTask + " пересекается по времени с другими задачами из списка");
+//            throw new IntersectionException("Подзадача " + subTask + " пересекается по времени с другими задачами из списка");
+//        }
 
         Epic currentEpic = getEpicById(subTask.getEpicId());
         SubTask oldSubTask = getSubTaskById(subTask.getId());
@@ -305,7 +310,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void removeTaskById(int taskId) {
         if (!isTaskExist(taskMap.get(taskId))) {
             System.out.println("Задачи с таким номер " + taskId + " нет в списке");
-            return;
+            throw new NotFoundException("Задачи с таким номер " + taskId + " нет в списке");
         }
 
         System.out.println("Задание удалено");
@@ -319,7 +324,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void removeEpicById(int epicId) {
         if (!isEpicExist(epicMap.get(epicId))) {
             System.out.println("Эпика с таким номером " + epicId + " нет в списке");
-            return;
+            throw new NotFoundException("Эпика с таким номером " + epicId + " нет в списке");
         }
 
         Epic currentEpic = epicMap.get(epicId);
@@ -340,7 +345,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void removeSubTaskById(Integer subTaskId) {
         if (!isSubTaskExist(subTaskMap.get(subTaskId))) {
             System.out.println("Подзадачи с таким номером " + subTaskId + " нет в списке");
-            return;
+            throw new NotFoundException("Подзадачи с таким номером " + subTaskId + " нет в списке");
         }
 
         SubTask currentSubTask = subTaskMap.get(subTaskId);
@@ -366,7 +371,7 @@ public class InMemoryTaskManager implements TaskManager {
 
         if (subTaskListByEpic.isEmpty()) {
             System.out.println("В этом эпики таких подзадач нет");
-            return subTaskListByEpic;
+            throw new NotFoundException("В этом эпики таких подзадач нет");
         }
 
         return subTaskListByEpic;

@@ -21,8 +21,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static ru.yandex.javacourse.kanban.manager.Stubs.FILE_HEADER;
-import static ru.yandex.javacourse.kanban.manager.Stubs.FORMATTER;
+import static ru.yandex.javacourse.kanban.Stubs.FORMATTER;
+import static ru.yandex.javacourse.kanban.Stubs.FILE_HEADER;
 
 public class FileBackedTaskManagerTest {
     public static FileBackedTaskManager fileBackedTaskManager;

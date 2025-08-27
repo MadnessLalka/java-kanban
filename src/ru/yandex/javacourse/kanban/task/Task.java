@@ -27,6 +27,18 @@ public class Task {
         this.id = id;
     }
 
+    public void setStatus(TaskStatus status) {
+        this.status = status;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
     public String getName() {
         return name;
     }

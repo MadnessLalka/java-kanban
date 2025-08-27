@@ -1,23 +1,42 @@
 package ru.yandex.javacourse.kanban.manager.handler;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import ru.yandex.javacourse.kanban.manager.TaskManager;
+import ru.yandex.javacourse.kanban.manager.exception.IntersectionException;
+import ru.yandex.javacourse.kanban.manager.exception.NotFoundException;
+import ru.yandex.javacourse.kanban.manager.handler.adapter.DurationAdapter;
+import ru.yandex.javacourse.kanban.manager.handler.adapter.LocalDateAdapter;
 import ru.yandex.javacourse.kanban.manager.handler.exception.HttpHandlerQueryException;
+import ru.yandex.javacourse.kanban.task.Task;
+import ru.yandex.javacourse.kanban.task.TaskStatus;
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+
+import static ru.yandex.javacourse.kanban.Stubs.FORMATTER;
 
 public class TaskHandler extends BaseHttpHandler implements HttpHandler {
     private final TaskManager taskManager;
+    private final Gson gson;
 
     public TaskHandler(TaskManager taskManager) {
         this.taskManager = taskManager;
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateAdapter());
+        gsonBuilder.registerTypeAdapter(Duration.class, new DurationAdapter());
+        gsonBuilder.setPrettyPrinting();
+        gson = gsonBuilder.create();
     }
 
     @Override
     public void handle(HttpExchange exchange) throws HttpHandlerQueryException {
-        try (OutputStream os = exchange.getResponseBody()) {
+        try {
             String method = exchange.getRequestMethod();
             System.out.println("Обработка метода " + method + " /tasks");
 
@@ -28,15 +47,60 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
             switch (method) {
                 case "GET" -> {
                     if (requestString.length == 2) {
-//                        resource = String.valueOf(taskManager.getAllTaskList());
-                        sendText(exchange, String.valueOf(taskManager.getAllTaskList()));
+                        resource = gson.toJson(taskManager.getAllTaskList());
+                        System.out.println(resource);
+                        sendText(exchange, resource);
+                    } else if (requestString.length == 3 && !requestString[2].isBlank()) {
+                        try {
+                            resource = gson.toJson(taskManager.getTaskById(Integer.parseInt(requestString[2])));
+                            System.out.println(resource);
+                            sendText(exchange, resource);
+                        } catch (NotFoundException e) {
+                            sendNotFound(exchange, e.getLocalizedMessage());
+                        }
                     }
+                }
+                case "POST" -> {
+                    String[] dataQuery = exchange.getRequestURI().getQuery().split("&");
+                    String name = dataQuery[0].split("=")[1];
+                    String description = dataQuery[1].split("=")[1];
+                    TaskStatus status = TaskStatus.valueOf(dataQuery[2].split("=")[1]);
+                    Duration duration = Duration.of(
+                            Integer.parseInt(dataQuery[3].split("=")[1]), ChronoUnit.MINUTES
+                    );
+                    LocalDateTime startTime = LocalDateTime.parse(dataQuery[4].split("=")[1], FORMATTER);
+
+                    if (requestString.length == 2) {
+                        try {
+                            taskManager.createTask(
+                                    new Task(name, description, taskManager.getNewId(), status, duration, startTime)
+                            );
+                            exchange.sendResponseHeaders(201, 0);
+                            exchange.close();
+                        } catch (IntersectionException e) {
+                            sendHasOverlaps(exchange, e.getLocalizedMessage());
+                        }
+                    } else {
+                        int id = Integer.parseInt(requestString[2]);
+                        try {
+                            taskManager.updateTask(
+                                    new Task(name, description, id, status, duration, startTime)
+                            );
+                            exchange.sendResponseHeaders(201, 0);
+                            exchange.close();
+                        } catch (NotFoundException e) {
+                            sendNotFound(exchange, e.getLocalizedMessage());
+                        } catch (IntersectionException e) {
+                            sendHasOverlaps(exchange, e.getLocalizedMessage());
+                        }
+                    }
+                }
+                default -> {
+                    System.out.println("Такого запроса нет в списке");
+                    sendNotFound(exchange, "Такого запроса нет в списке");
                 }
             }
 
-
-//            exchange.sendResponseHeaders(200, 0);
-//            os.write(resource.getBytes());
 
         } catch (IOException e) {
             throw new HttpHandlerQueryException("Ошибка при обращение к TaskHandler", e);
