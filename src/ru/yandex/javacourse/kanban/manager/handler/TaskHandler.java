@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
 
 import static ru.yandex.javacourse.kanban.Stubs.FORMATTER;
 

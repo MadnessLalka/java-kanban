@@ -140,13 +140,13 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void createTask(Task task) {
         if (isTaskExist(taskMap.get(task.getId()))) {
-            System.out.println("Такая задача " + task + " уже поставлена");
+            System.out.println("Такая задача " + task.getName() + " уже поставлена");
             return;
         }
 
         if (isTaskIntersectToAllTaskToTime(task)) {
-            System.out.println("Задача " + task + " пересекается по времени с другими задачами из списка");
-            throw new IntersectionException("Задача " + task.getId() + " пересекается по времени с другими задачами из списка");
+            System.out.println("Задача `" + task.getName() + "` пересекается по времени с другими задачами из списка");
+            throw new IntersectionException("Задача `" + task.getName() + "` пересекается по времени с другими задачами из списка");
         }
 
         taskMap.put(task.getId(), task);
@@ -166,8 +166,8 @@ public class InMemoryTaskManager implements TaskManager {
         }
 
         if (isTaskIntersectToAllTaskToTime(epic)) {
-            System.out.println("Эпик " + epic + " пересекаются по времени с другими задачами из списка");
-            throw new IntersectionException("Эпик " + epic + " пересекается по времени с другими задачами из списка");
+            System.out.println("Эпик `" + epic.getName() + "` пересекаются по времени с другими задачами из списка");
+            throw new IntersectionException("Эпик `" + epic.getName() + "` пересекается по времени с другими задачами из списка");
         }
 
         epic.setStatus();
@@ -187,13 +187,13 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void createSubTask(SubTask subTask) {
         if (isSubTaskExist(subTaskMap.get(subTask.getId()))) {
-            System.out.println("Такая подзадача " + subTask + " уже поставлена");
+            System.out.println("Такая подзадача " + subTask.getName() + " уже поставлена");
             return;
         }
 
         if (isTaskIntersectToAllTaskToTime(subTask)) {
-            System.out.println("Подзадача " + subTask + " пересекаются по времени с другими задачами из списка");
-            throw new IntersectionException("Эпик " + subTask + " пересекается по времени с другими задачами из списка");
+            System.out.println("Подзадача `" + subTask.getName() + "` пересекаются по времени с другими задачами из списка");
+            throw new IntersectionException("Эпик `" + subTask.getName() + "` пересекается по времени с другими задачами из списка");
         }
 
         Epic currentEpic = getEpicById(subTask.getEpicId());
@@ -239,14 +239,14 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateTask(Task task) {
         if (!isTaskExist(taskMap.get(task.getId()))) {
-            System.out.println("Такой задачи " + task + " нет в списках");
-            throw new NotFoundException("Такой задачи " + task + " нет в списках");
+            System.out.println("Такой задачи `" + task.getName() + "` нет в списках");
+            throw new NotFoundException("Такой задачи `" + task.getName() + "` нет в списках");
         }
 
-//        if (isTaskIntersectToAllTaskToTime(task)) {
-//            System.out.println("Задача " + task + " пересекаются по времени с другими задачами из списка");
-//            throw new IntersectionException("Задача " + task + " пересекаются по времени с другими задачами из списка");
-//        }
+        if (isTaskIntersectToAllTaskToTime(task)) {
+            System.out.println("Задача `" + task.getName() + "` пересекаются по времени с другими задачами из списка");
+            throw new IntersectionException("Задача `" + task.getName() + "` пересекаются по времени с другими задачами из списка");
+        }
 
         System.out.println("Задача обновлена");
         prioritizedTasks.remove(taskMap.get(task.getId()));
@@ -257,14 +257,14 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateEpic(Epic epic) {
         if (!isEpicExist(epicMap.get(epic.getId()))) {
-            System.out.println("Такого эпика " + epic + "нет в списках");
-            throw new NotFoundException("Такого эпика " + epic + " нет в списках");
+            System.out.println("Такого эпика `" + epic.getName() + "` нет в списках");
+            throw new NotFoundException("Такого эпика `" + epic.getName() + "` нет в списках");
         }
 
-//        if (isTaskIntersectToAllTaskToTime(epic)) {
-//            System.out.println("Эпик " + epic + " пересекается по времени с другими задачами из списка");
-//            throw new IntersectionException("Эпик " + epic + " пересекается по времени с другими задачами из списка");
-//        }
+        if (isTaskIntersectToAllTaskToTime(epic)) {
+            System.out.println("Эпик `" + epic.getName() + "` пересекается по времени с другими задачами из списка");
+            throw new IntersectionException("Эпик `" + epic.getName() + "` пересекается по времени с другими задачами из списка");
+        }
 
         epic.setStatus();
         epic.setDuration();
@@ -285,10 +285,10 @@ public class InMemoryTaskManager implements TaskManager {
             throw new NotFoundException("Такой подзадачи '" + subTask.getName() + "' нет в списках");
         }
 
-//        if (isTaskIntersectToAllTaskToTime(subTask)) {
-//            System.out.println("Подзадача " + subTask + " пересекается по времени с другими задачами из списка");
-//            throw new IntersectionException("Подзадача " + subTask + " пересекается по времени с другими задачами из списка");
-//        }
+        if (isTaskIntersectToAllTaskToTime(subTask)) {
+            System.out.println("Подзадача `" + subTask.getName() + "` пересекается по времени с другими задачами из списка");
+            throw new IntersectionException("Подзадача `" + subTask.getName() + "` пересекается по времени с другими задачами из списка");
+        }
 
         Epic currentEpic = getEpicById(subTask.getEpicId());
         SubTask oldSubTask = getSubTaskById(subTask.getId());
