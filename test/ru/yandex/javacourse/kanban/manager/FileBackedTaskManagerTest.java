@@ -4,6 +4,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import ru.yandex.javacourse.kanban.manager.exception.IntersectionException;
 import ru.yandex.javacourse.kanban.manager.exception.InvalidTaskTypeException;
 import ru.yandex.javacourse.kanban.manager.exception.ManagerReadException;
 import ru.yandex.javacourse.kanban.manager.exception.ManagerSaveException;
@@ -452,11 +453,13 @@ public class FileBackedTaskManagerTest {
 
         //when
         fileBackedTaskManager.createTask(newTask);
-        fileBackedTaskManager.createTask(newTask1);
 
         //then
-        assertTrue(fileBackedTaskManager.isTasksIntersectToTime(newTask, newTask1),
-                "Время выполнение заявок должно пересекаться");
+
+        assertThrows(IntersectionException.class, () -> {
+                    fileBackedTaskManager.createTask(newTask1);
+                }, "Создать задачу с пересечение по времени - невозможно");
+
     }
 
     @DisplayName("Проверка параллельности задач")
@@ -600,10 +603,11 @@ public class FileBackedTaskManagerTest {
         fileBackedTaskManager.createSubTask(newSubTask);
         fileBackedTaskManager.createSubTask(newSubTask1);
 
-        fileBackedTaskManager.createSubTask(newSubTask2);
-
         //then
-        assertNull(fileBackedTaskManager.getSubTaskById(newSubTask2.getId()));
+
+        assertThrows(IntersectionException.class, () -> {
+            fileBackedTaskManager.createSubTask(newSubTask2);
+        }, "Добавить подзадачу с пересечением по времени - невозможно");
     }
 
 }

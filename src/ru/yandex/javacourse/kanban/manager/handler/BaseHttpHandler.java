@@ -1,7 +1,6 @@
 package ru.yandex.javacourse.kanban.manager.handler;
 
 import com.sun.net.httpserver.HttpExchange;
-import ru.yandex.javacourse.kanban.manager.exception.NotFoundException;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

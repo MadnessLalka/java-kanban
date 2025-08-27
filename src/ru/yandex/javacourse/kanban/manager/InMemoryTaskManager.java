@@ -363,7 +363,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<SubTask> getAllSubTaskByEpic(Task epic) {
+    public ArrayList<SubTask> getAllSubTaskByEpic(Task epic)  {
         ArrayList<SubTask> subTaskListByEpic = new ArrayList<>(
                 getAllSubTaskList().stream()
                         .filter(subTask -> Objects.equals(subTask.getEpicId(), epic.getId()))
@@ -371,7 +371,6 @@ public class InMemoryTaskManager implements TaskManager {
 
         if (subTaskListByEpic.isEmpty()) {
             System.out.println("В этом эпики таких подзадач нет");
-            throw new NotFoundException("В этом эпики таких подзадач нет");
         }
 
         return subTaskListByEpic;

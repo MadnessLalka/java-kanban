@@ -94,6 +94,17 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
                         }
                     }
                 }
+                case "DELETE" -> {
+                    int id = Integer.parseInt(requestString[2]);
+
+                    try {
+                        taskManager.removeTaskById(id);
+                        exchange.sendResponseHeaders(200, 0);
+                        exchange.close();
+                    } catch (NotFoundException e) {
+                        sendNotFound(exchange, e.getLocalizedMessage());
+                    }
+                }
                 default -> {
                     System.out.println("Такого запроса нет в списке");
                     sendNotFound(exchange, "Такого запроса нет в списке");
