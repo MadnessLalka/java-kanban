@@ -13,6 +13,8 @@ public class HttpTaskServer {
 
     public static void main(String[] args) throws HttpServerCreateException {
         TaskManager taskManager = Managers.getDefault();
+        HistoryManager historyManager = Managers.getDefaultHistory();
+        taskManager.setHistoryManager(historyManager);
 
         try {
             HttpServer httpServer = HttpServer.create();
@@ -21,8 +23,8 @@ public class HttpTaskServer {
             httpServer.createContext("/tasks", new TaskHandler(taskManager));
             httpServer.createContext("/subtasks", new SubTaskHandler(taskManager));
             httpServer.createContext("/epics", new EpicHandler(taskManager));
-            httpServer.createContext("/history", new HistoryHandler());
-            httpServer.createContext("/prioritized", new PrioritizedHandler());
+            httpServer.createContext("/history", new HistoryHandler(historyManager));
+            httpServer.createContext("/prioritized", new PrioritizedHandler(taskManager));
             httpServer.start();
             System.out.println("HTTP-сервер запущен на " + PORT + " порту!");
 

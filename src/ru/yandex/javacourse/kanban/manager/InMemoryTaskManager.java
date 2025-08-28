@@ -29,6 +29,10 @@ public class InMemoryTaskManager implements TaskManager {
         }
     });
 
+    public HistoryManager getHistoryManager() {
+        return historyManager;
+    }
+
     public void setHistoryManager(HistoryManager historyManager) {
         this.historyManager = historyManager;
     }
@@ -164,7 +168,6 @@ public class InMemoryTaskManager implements TaskManager {
             System.out.println("Такой эпик " + epic + " уже поставлен");
             return;
         }
-
 
         epic.setStatus();
         epic.setDuration();
