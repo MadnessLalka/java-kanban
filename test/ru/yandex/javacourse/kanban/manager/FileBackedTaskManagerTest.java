@@ -22,8 +22,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static ru.yandex.javacourse.kanban.manager.Stubs.FILE_HEADER_TEST;
-import static ru.yandex.javacourse.kanban.manager.Stubs.FORMATTER_TEST;
+import static ru.yandex.javacourse.kanban.StubsTest.FILE_HEADER;
+import static ru.yandex.javacourse.kanban.StubsTest.FORMATTER;
 
 public class FileBackedTaskManagerTest {
     public static FileBackedTaskManager fileBackedTaskManager;
@@ -73,8 +73,8 @@ public class FileBackedTaskManagerTest {
 
         //then
         assertEquals(("0,EPIC,Первый эпик,NEW,Описание первого Эпика,0,"
-                        + LocalDateTime.now().format(FORMATTER_TEST) + ","
-                        + LocalDateTime.now().format(FORMATTER_TEST)), epicToString,
+                        + LocalDateTime.now().format(FORMATTER) + ","
+                        + LocalDateTime.now().format(FORMATTER)), epicToString,
                 "Текстовое описание должно быть эквивалентно");
     }
 
@@ -216,7 +216,7 @@ public class FileBackedTaskManagerTest {
         String memory = Files.readString(tempFile.toPath());
 
         //then
-        assertEquals(FILE_HEADER_TEST + "\n", memory, "В файле должен появится заголовок");
+        assertEquals(FILE_HEADER + "\n", memory, "В файле должен появится заголовок");
     }
 
     @DisplayName("Проверка сохранения задач в файл")
@@ -240,7 +240,7 @@ public class FileBackedTaskManagerTest {
         fileBackedTaskManager.createEpic(newEpic);
         fileBackedTaskManager.createSubTask(newSubTask);
 
-        String tasksLine = FILE_HEADER_TEST + "\n" +
+        String tasksLine = FILE_HEADER + "\n" +
                 fileBackedTaskManager.toString(newTask) + "\n" +
                 fileBackedTaskManager.toString(newEpic) + "\n" +
                 fileBackedTaskManager.toString(newSubTask) + "\n";
@@ -271,7 +271,7 @@ public class FileBackedTaskManagerTest {
                 LocalDateTime.of(2024, 12, 1, 1, 1));
 
         Writer fileWriter = new FileWriter(tempFile, true);
-        fileWriter.write(FILE_HEADER_TEST + "\n");
+        fileWriter.write(FILE_HEADER + "\n");
         fileWriter.write(fileBackedTaskManager.toString(newTask) + "\n");
         fileWriter.write(fileBackedTaskManager.toString(newEpic) + "\n");
         fileWriter.write(fileBackedTaskManager.toString(newSubTask) + "\n");
