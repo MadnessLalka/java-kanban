@@ -11,7 +11,6 @@ import ru.yandex.javacourse.kanban.manager.handler.adapter.DurationAdapter;
 import ru.yandex.javacourse.kanban.manager.handler.adapter.LocalDateAdapter;
 import ru.yandex.javacourse.kanban.manager.handler.exception.HttpHandlerQueryException;
 import ru.yandex.javacourse.kanban.task.SubTask;
-import ru.yandex.javacourse.kanban.task.Task;
 import ru.yandex.javacourse.kanban.task.TaskStatus;
 
 import java.io.IOException;
@@ -38,7 +37,7 @@ public class SubTaskHandler extends BaseHttpHandler implements HttpHandler {
     public void handle(HttpExchange exchange) throws HttpHandlerQueryException {
         try {
             String method = exchange.getRequestMethod();
-            System.out.println("Обработка метода " + method + " /subtask");
+            System.out.println("Обработка метода " + method + " /subtasks");
 
             String path = exchange.getRequestURI().getPath();
 

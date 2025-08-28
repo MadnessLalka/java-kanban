@@ -165,10 +165,6 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
 
-        if (isTaskIntersectToAllTaskToTime(epic)) {
-            System.out.println("Эпик `" + epic.getName() + "` пересекаются по времени с другими задачами из списка");
-            throw new IntersectionException("Эпик `" + epic.getName() + "` пересекается по времени с другими задачами из списка");
-        }
 
         epic.setStatus();
         epic.setDuration();
