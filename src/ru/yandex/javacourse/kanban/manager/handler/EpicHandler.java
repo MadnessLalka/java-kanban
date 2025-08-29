@@ -1,6 +1,8 @@
 package ru.yandex.javacourse.kanban.manager.handler;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import ru.yandex.javacourse.kanban.manager.TaskManager;
@@ -10,6 +12,7 @@ import ru.yandex.javacourse.kanban.manager.handler.exception.HttpHandlerQueryExc
 import ru.yandex.javacourse.kanban.task.Epic;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class EpicHandler extends BaseHttpHandler implements HttpHandler {
@@ -60,17 +63,17 @@ public class EpicHandler extends BaseHttpHandler implements HttpHandler {
                     }
                 }
                 case "POST" -> {
-                    String[] dataQuery = exchange.getRequestURI().getQuery().split("&");
-                    String name = dataQuery[0].split("=")[1];
-                    String description = dataQuery[1].split("=")[1];
+                    String requestJson = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+                    JsonObject epicObject = JsonParser.parseString(requestJson).getAsJsonObject();
 
-                    if (requestString.length == 2) {
+                    if (requestString.length == 2 && !requestJson.contains("id")) {
+                        int newId = taskManager.getNewId();
+                        epicObject.addProperty("id", newId);
+                        Epic newEpic = gson.fromJson(epicObject, Epic.class);
+
                         try {
                             taskManager.createEpic(
-                                    new Epic(name,
-                                            description,
-                                            taskManager.getNewId()
-                                    )
+                                    newEpic
                             );
                             exchange.sendResponseHeaders(201, 0);
                             exchange.close();

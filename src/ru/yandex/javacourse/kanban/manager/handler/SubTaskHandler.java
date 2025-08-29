@@ -2,6 +2,8 @@ package ru.yandex.javacourse.kanban.manager.handler;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import ru.yandex.javacourse.kanban.manager.TaskManager;
@@ -11,9 +13,11 @@ import ru.yandex.javacourse.kanban.manager.handler.adapter.DurationAdapter;
 import ru.yandex.javacourse.kanban.manager.handler.adapter.LocalDateAdapter;
 import ru.yandex.javacourse.kanban.manager.handler.exception.HttpHandlerQueryException;
 import ru.yandex.javacourse.kanban.task.SubTask;
+import ru.yandex.javacourse.kanban.task.Task;
 import ru.yandex.javacourse.kanban.task.TaskStatus;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -56,39 +60,25 @@ public class SubTaskHandler extends BaseHttpHandler implements HttpHandler {
                     }
                 }
                 case "POST" -> {
-                    String[] dataQuery = exchange.getRequestURI().getQuery().split("&");
-                    String name = dataQuery[0].split("=")[1];
-                    String description = dataQuery[1].split("=")[1];
-                    TaskStatus status = TaskStatus.valueOf(dataQuery[2].split("=")[1]);
-                    int epicId = Integer.parseInt(dataQuery[3].split("=")[1]);
-                    Duration duration = Duration.of(
-                            Integer.parseInt(dataQuery[4].split("=")[1]), ChronoUnit.MINUTES
-                    );
-                    LocalDateTime startTime = LocalDateTime.parse(dataQuery[5].split("=")[1], FORMATTER);
+                    String requestJson = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+                    JsonObject subTaskObject = JsonParser.parseString(requestJson).getAsJsonObject();
 
-                    if (requestString.length == 2) {
+                    if (requestString.length == 2 && !requestJson.contains("id")) {
+                        int newId = taskManager.getNewId();
+                        subTaskObject.addProperty("id", newId);
+                        SubTask newSubTask = gson.fromJson(subTaskObject, SubTask.class);
+
                         try {
-                            taskManager.createSubTask(
-                                    new SubTask(name,
-                                            description,
-                                            taskManager.getNewId(),
-                                            status,
-                                            epicId,
-                                            duration,
-                                            startTime
-                                    )
-                            );
+                            taskManager.createSubTask(newSubTask);
                             exchange.sendResponseHeaders(201, 0);
                             exchange.close();
                         } catch (IntersectionException e) {
                             sendHasOverlaps(exchange, e.getLocalizedMessage());
                         }
-                    } else {
-                        int id = Integer.parseInt(requestString[2]);
+                    } else if (requestString.length == 2 && requestJson.contains("id")) {
+                        SubTask newSubTask = gson.fromJson(subTaskObject, SubTask.class);
                         try {
-                            taskManager.updateSubTask(
-                                    new SubTask(name, description, id, status, epicId, duration, startTime)
-                            );
+                            taskManager.updateSubTask(newSubTask);
                             exchange.sendResponseHeaders(201, 0);
                             exchange.close();
                         } catch (NotFoundException e) {
