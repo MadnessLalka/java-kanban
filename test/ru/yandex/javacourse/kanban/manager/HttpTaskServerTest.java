@@ -1,6 +1,7 @@
 package ru.yandex.javacourse.kanban.manager;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -167,11 +168,10 @@ class HttpTaskServerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(201, response.statusCode());
 
-        url = URI.create(SERVER_URL + "/tasks");
+        url = URI.create(SERVER_URL + "/tasks/");
         request = HttpRequest.newBuilder().uri(url).GET().build();
         response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, response.statusCode());
-        JsonObject jsonObjectTask1 = gson.toJson(response.body());
 
         // when
         url = URI.create(SERVER_URL + "/tasks/0");
@@ -179,9 +179,10 @@ class HttpTaskServerTest {
         response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, response.statusCode());
 
-        JsonObject jsonObjectTask2 = gson.fromJson(response.body(), JsonObject.class);
+        List<Task> tasksFromManager = manager.getAllTaskList();
 
-        assertEquals(jsonObjectTask1, jsonObjectTask2, "Объекты должны быть идентичны");
+        JsonObject jsonObjectTask1 = gson.fromJson(response.body(), JsonObject.class);
+        assertEquals(jsonObjectTask1.get("name").getAsString(), tasksFromManager.get(0).getName(), "Некорректное имя задачи");
     }
 
 }
