@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static ru.yandex.javacourse.kanban.StubsTest.SERVER_URL;
 
- class HttpTaskServerTest {
+class HttpTaskServerTest {
     // создаём экземпляр InMemoryTaskManager
     TaskManager manager = new InMemoryTaskManager();
     // передаём его в качестве аргумента в конструктор HttpTaskServer
@@ -30,7 +30,7 @@ import static ru.yandex.javacourse.kanban.StubsTest.SERVER_URL;
     }
 
     @BeforeEach
-     void setUp() {
+    void setUp() {
         manager.removeAllTask();
         manager.removeAllSubTask();
         manager.removeAllEpic();
@@ -38,13 +38,13 @@ import static ru.yandex.javacourse.kanban.StubsTest.SERVER_URL;
     }
 
     @AfterEach
-     void shutDown() {
+    void shutDown() {
         taskServer.stop();
     }
 
     @DisplayName("Добавление задачи")
     @Test
-     void addTask_Add_TaskFromHttpServer() throws IOException, InterruptedException {
+    void addTask_Add_TaskFromHttpServer() throws IOException, InterruptedException {
         // given
         JsonObject jsonObjectTask = new JsonObject();
         jsonObjectTask.addProperty("name", "Test 2");
@@ -60,6 +60,7 @@ import static ru.yandex.javacourse.kanban.StubsTest.SERVER_URL;
         URI url = URI.create(SERVER_URL + "/tasks");
         HttpRequest request = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(taskJson)).build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        client.close();
 
         // then
         assertEquals(201, response.statusCode());
@@ -70,31 +71,47 @@ import static ru.yandex.javacourse.kanban.StubsTest.SERVER_URL;
         assertEquals("Test 2", tasksFromManager.get(0).getName(), "Некорректное имя задачи");
     }
 
-     @DisplayName("Добавление задачи")
-     @Test
-     void updateTask_Update_TaskToHttpServer() throws IOException, InterruptedException {
-         // given
-         JsonObject jsonObjectTask = new JsonObject();
-         jsonObjectTask.addProperty("name", "Test 2");
-         jsonObjectTask.addProperty("description", "Testing task 2");
-         jsonObjectTask.addProperty("status", "NEW");
-         jsonObjectTask.addProperty("duration", "PT29M");
-         jsonObjectTask.addProperty("startTime", "2025 01 01 01 01");
+    @DisplayName("Обновление задачи")
+    @Test
+    void updateTask_Update_TaskToHttpServer() throws IOException, InterruptedException {
+        // given
+        JsonObject jsonObjectTask = new JsonObject();
+        jsonObjectTask.addProperty("name", "Test 2");
+        jsonObjectTask.addProperty("description", "Testing task 2");
+        jsonObjectTask.addProperty("status", "NEW");
+        jsonObjectTask.addProperty("duration", "PT29M");
+        jsonObjectTask.addProperty("startTime", "2025 01 01 01 01");
 
-         // when
-         String taskJson = gson.toJson(jsonObjectTask);
+        JsonObject updatedJsonObjectTask = new JsonObject();
+        jsonObjectTask.addProperty("name", "Test 2 обновлённый");
+        jsonObjectTask.addProperty("description", "Testing task 2");
+        jsonObjectTask.addProperty("status", "NEW");
+        jsonObjectTask.addProperty("id", "0");
+        jsonObjectTask.addProperty("duration", "PT29M");
+        jsonObjectTask.addProperty("startTime", "2025 04 01 01 01");
 
-         HttpClient client = HttpClient.newHttpClient();
-         URI url = URI.create(SERVER_URL + "/tasks");
-         HttpRequest request = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(taskJson)).build();
-         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        String taskJson = gson.toJson(jsonObjectTask);
+        String taskJsonUpdated = gson.toJson(updatedJsonObjectTask);
 
-         // then
-         assertEquals(201, response.statusCode());
-         List<Task> tasksFromManager = manager.getAllTaskList();
+        HttpClient client = HttpClient.newHttpClient();
+        URI url = URI.create(SERVER_URL + "/tasks");
+        HttpRequest request = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(taskJson)).build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(201, response.statusCode());
+        request = null;
+        response = null;
 
-         assertNotNull(tasksFromManager, "Задачи не возвращаются");
-         assertEquals(1, tasksFromManager.size(), "Некорректное количество задач");
-         assertEquals("Test 2", tasksFromManager.get(0).getName(), "Некорректное имя задачи");
-     }
+        // then
+        url = URI.create(SERVER_URL + "/tasks");
+        request = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(taskJsonUpdated)).build();
+        response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(201, response.statusCode());
+        client.close();
+
+        List<Task> tasksFromManager = manager.getAllTaskList();
+
+        assertNotNull(tasksFromManager, "Задачи не возвращаются");
+        assertEquals(1, tasksFromManager.size(), "Некорректное количество задач");
+        assertEquals("Test 2 обновлённый", tasksFromManager.get(0).getName(), "Некорректное имя задачи");
+    }
 }
