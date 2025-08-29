@@ -53,7 +53,7 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
                     String requestJson = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
                     JsonObject taskObject = JsonParser.parseString(requestJson).getAsJsonObject();
 
-                    if (requestString.length == 2 && !requestJson.contains("id: -1")) {
+                    if (requestString.length == 2 && !requestJson.contains("id")) {
                         int newId = taskManager.getNewId();
                         taskObject.remove("id");
                         taskObject.addProperty("id", newId);
@@ -66,7 +66,7 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
                         } catch (IntersectionException e) {
                             sendHasOverlaps(exchange, e.getLocalizedMessage());
                         }
-                    } else if (requestString.length == 2 && requestJson.contains("id: -1")) {
+                    } else if (requestString.length == 2 && requestJson.contains("id")) {
                         Task newTask = gson.fromJson(taskObject, Task.class);
                         try {
                             taskManager.updateTask(newTask);
