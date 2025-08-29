@@ -362,7 +362,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<SubTask> getAllSubTaskByEpic(Task epic)  {
+    public ArrayList<SubTask> getAllSubTaskByEpic(Task epic) {
         ArrayList<SubTask> subTaskListByEpic = new ArrayList<>(
                 getAllSubTaskList().stream()
                         .filter(subTask -> Objects.equals(subTask.getEpicId(), epic.getId()))

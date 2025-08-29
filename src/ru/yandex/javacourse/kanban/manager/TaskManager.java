@@ -33,9 +33,9 @@ public interface TaskManager {
 
     void createTask(Task task) throws IntersectionException;
 
-    void createEpic(Epic epic)  throws IntersectionException;
+    void createEpic(Epic epic) throws IntersectionException;
 
-    void createSubTask(SubTask subTask)  throws IntersectionException;
+    void createSubTask(SubTask subTask) throws IntersectionException;
 
     void updateTask(Task task) throws NotFoundException, IntersectionException;
 

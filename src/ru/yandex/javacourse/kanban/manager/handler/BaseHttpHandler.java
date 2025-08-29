@@ -22,7 +22,7 @@ public class BaseHttpHandler {
         h.close();
     }
 
-    protected void sendHasOverlaps(HttpExchange h,String text) throws IOException {
+    protected void sendHasOverlaps(HttpExchange h, String text) throws IOException {
         byte[] resp = text.getBytes(StandardCharsets.UTF_8);
         h.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
         h.sendResponseHeaders(406, resp.length);

@@ -24,13 +24,9 @@ public class SubTaskHandler extends BaseHttpHandler implements HttpHandler {
     private final TaskManager taskManager;
     private final Gson gson;
 
-    public SubTaskHandler(TaskManager taskManager) {
+    public SubTaskHandler(TaskManager taskManager, Gson gson) {
         this.taskManager = taskManager;
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateAdapter());
-        gsonBuilder.registerTypeAdapter(Duration.class, new DurationAdapter());
-        gsonBuilder.setPrettyPrinting();
-        gson = gsonBuilder.create();
+        this.gson = gson;
     }
 
     @Override

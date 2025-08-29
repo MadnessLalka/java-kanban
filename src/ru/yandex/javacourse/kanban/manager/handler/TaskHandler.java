@@ -24,14 +24,11 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
     private final TaskManager taskManager;
     private final Gson gson;
 
-    public TaskHandler(TaskManager taskManager) {
+    public TaskHandler(TaskManager taskManager, Gson gson) {
         this.taskManager = taskManager;
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateAdapter());
-        gsonBuilder.registerTypeAdapter(Duration.class, new DurationAdapter());
-        gsonBuilder.setPrettyPrinting();
-        gson = gsonBuilder.create();
+        this.gson = gson;
     }
+
 
     @Override
     public void handle(HttpExchange exchange) throws HttpHandlerQueryException {
@@ -110,7 +107,6 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
                     sendNotFound(exchange, "Такого запроса нет в списке");
                 }
             }
-
 
         } catch (IOException e) {
             throw new HttpHandlerQueryException("Ошибка при обращение к TaskHandler", e);
