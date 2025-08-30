@@ -68,12 +68,13 @@ public class EpicHandler extends BaseHttpHandler implements HttpHandler {
 
                     if (requestString.length == 2 && !requestJson.contains("id")) {
                         int newId = taskManager.getNewId();
-                        epicObject.addProperty("id", newId);
-                        Epic newEpic = gson.fromJson(epicObject, Epic.class);
+                        Epic epic = new Epic(
+                                epicObject.get("name").getAsString(), epicObject.get("description").getAsString(), newId
+                        );
 
                         try {
                             taskManager.createEpic(
-                                    newEpic
+                                    epic
                             );
                             exchange.sendResponseHeaders(201, 0);
                             exchange.close();

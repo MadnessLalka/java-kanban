@@ -1,17 +1,17 @@
-package ru.yandex.javacourse.kanban.manager;
+package ru.yandex.javacourse.kanban.manager.httpmanager;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import ru.yandex.javacourse.kanban.manager.HttpTaskServer;
+import ru.yandex.javacourse.kanban.manager.InMemoryTaskManager;
+import ru.yandex.javacourse.kanban.manager.TaskManager;
 import ru.yandex.javacourse.kanban.task.Task;
 
-import javax.sound.midi.Soundbank;
 import java.io.IOException;
-import java.net.Socket;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -22,14 +22,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static ru.yandex.javacourse.kanban.StubsTest.SERVER_URL;
 
-class HttpTaskServerTest {
-    // создаём экземпляр InMemoryTaskManager
+class HttpTaskManagerTest {
     TaskManager manager = new InMemoryTaskManager();
-    // передаём его в качестве аргумента в конструктор HttpTaskServer
     HttpTaskServer taskServer = new HttpTaskServer(manager);
     Gson gson = taskServer.getGson();
 
-    public HttpTaskServerTest() throws IOException {
+    public HttpTaskManagerTest() throws IOException {
     }
 
     @BeforeEach
@@ -183,6 +181,46 @@ class HttpTaskServerTest {
 
         JsonObject jsonObjectTask1 = gson.fromJson(response.body(), JsonObject.class);
         assertEquals(jsonObjectTask1.get("name").getAsString(), tasksFromManager.get(0).getName(), "Некорректное имя задачи");
+    }
+
+    @DisplayName("Проверка на исключение задача не найдена")
+    @Test
+    void getThrow_GetThrow_NotFoundTask() throws IOException, InterruptedException {
+        //given
+        HttpClient client = HttpClient.newHttpClient();
+        URI url = URI.create(SERVER_URL + "/tasks/0");
+
+        //when
+        HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        //then
+        assertEquals(404, response.statusCode());
+    }
+
+    @DisplayName("Проверка на исключение задача пересекается с существующей по времени")
+    @Test
+    void getThrow_GetThrow_IntersectionTask() throws IOException, InterruptedException {
+        // given
+        JsonObject jsonObjectTask = new JsonObject();
+        jsonObjectTask.addProperty("name", "Test 2");
+        jsonObjectTask.addProperty("description", "Testing task 2");
+        jsonObjectTask.addProperty("status", "NEW");
+        jsonObjectTask.addProperty("duration", "PT29M");
+        jsonObjectTask.addProperty("startTime", "2025 01 01 01 01");
+
+        String taskJson = gson.toJson(jsonObjectTask);
+
+        HttpClient client = HttpClient.newHttpClient();
+        URI url = URI.create(SERVER_URL + "/tasks");
+        HttpRequest request = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(taskJson)).build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(201, response.statusCode());
+
+         url = URI.create(SERVER_URL + "/tasks");
+         request = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(taskJson)).build();
+        response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(406, response.statusCode());
     }
 
 }

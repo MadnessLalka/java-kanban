@@ -14,10 +14,10 @@ public class Epic extends Task {
 
     public Epic(String name, String description, int taskId) {
         super(name, description, taskId);
-        super.setStatus(TaskStatus.NEW);
-        super.setDuration(Duration.ofMinutes(0));
-        super.setStartTime(LocalDateTime.parse(LocalDateTime.now().format(FORMATTER), FORMATTER));
-        this.endTime = LocalDateTime.parse(LocalDateTime.now().format(FORMATTER), FORMATTER);
+        setStatus();
+        setDuration();
+        setStartTime();
+        setEndTime();
     }
 
     @Override
