@@ -6,9 +6,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import ru.yandex.javacourse.kanban.manager.HttpTaskServer;
-import ru.yandex.javacourse.kanban.manager.InMemoryTaskManager;
-import ru.yandex.javacourse.kanban.manager.TaskManager;
+import ru.yandex.javacourse.kanban.manager.*;
 import ru.yandex.javacourse.kanban.task.Task;
 
 import java.io.IOException;
@@ -24,7 +22,8 @@ import static ru.yandex.javacourse.kanban.StubsTest.SERVER_URL;
 
 class HttpTaskManagerTest {
     TaskManager manager = new InMemoryTaskManager();
-    HttpTaskServer taskServer = new HttpTaskServer(manager);
+    HistoryManager historyManager = new InMemoryHistoryManager();
+    HttpTaskServer taskServer = new HttpTaskServer(manager, historyManager);
     Gson gson = taskServer.getGson();
 
     public HttpTaskManagerTest() throws IOException {
@@ -217,8 +216,8 @@ class HttpTaskManagerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(201, response.statusCode());
 
-         url = URI.create(SERVER_URL + "/tasks");
-         request = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(taskJson)).build();
+        url = URI.create(SERVER_URL + "/tasks");
+        request = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(taskJson)).build();
         response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(406, response.statusCode());
     }

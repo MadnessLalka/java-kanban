@@ -1,14 +1,13 @@
 package ru.yandex.javacourse.kanban.manager.httpmanager;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import ru.yandex.javacourse.kanban.manager.HttpTaskServer;
-import ru.yandex.javacourse.kanban.manager.InMemoryTaskManager;
-import ru.yandex.javacourse.kanban.manager.TaskManager;
+import ru.yandex.javacourse.kanban.manager.*;
 import ru.yandex.javacourse.kanban.task.Epic;
 import ru.yandex.javacourse.kanban.task.SubTask;
 
@@ -23,12 +22,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static ru.yandex.javacourse.kanban.StubsTest.SERVER_URL;
 
-class HttpEpicTaskManagerTest {
+class HttpEpicManagerTest {
     TaskManager manager = new InMemoryTaskManager();
-    HttpTaskServer taskServer = new HttpTaskServer(manager);
+    HistoryManager historyManager = new InMemoryHistoryManager();
+    HttpTaskServer taskServer = new HttpTaskServer(manager, historyManager);
     Gson gson = taskServer.getGson();
 
-    public HttpEpicTaskManagerTest() throws IOException {
+    public HttpEpicManagerTest() throws IOException {
     }
 
     @BeforeEach
@@ -160,24 +160,25 @@ class HttpEpicTaskManagerTest {
 
         // when
         url = URI.create(SERVER_URL + "/epics/0/subtasks");
-        request = HttpRequest.newBuilder().uri(url).GET().build();
-        response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(200, response.statusCode());
+        HttpRequest request1 = HttpRequest.newBuilder().uri(url).GET().build();
+        HttpResponse<String> response1 = client.send(request1, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, response1.statusCode());
 
         List<SubTask> tasksFromManager = manager.getAllSubTaskList();
+        System.out.println(response.body());
+        JsonArray jsonObjectSubTask1 = gson.fromJson(response1.body(), JsonArray.class);
 
-        JsonObject jsonObjectTask1 = gson.fromJson(response.body(), JsonObject.class);
-        assertEquals(jsonObjectTask1.get("name").getAsString(), tasksFromManager.get(0).getName(), "Некорректное имя подзадачи");
+        assertEquals(jsonObjectSubTask1.get(0).getAsJsonObject().get("name").getAsString(),
+                tasksFromManager.get(0).getName(), "Некорректное имя подзадачи");
     }
 
 
-
-    @DisplayName("Проверка на исключение подзадача не найдена")
+    @DisplayName("Проверка на исключение эпик не найден")
     @Test
-    void getThrow_GetThrow_NotFoundSubTask() throws IOException, InterruptedException {
+    void getThrow_GetThrow_NotFoundEpic() throws IOException, InterruptedException {
         //given
         HttpClient client = HttpClient.newHttpClient();
-        URI url = URI.create(SERVER_URL + "/subtasks/0");
+        URI url = URI.create(SERVER_URL + "/epics/0");
 
         //when
         HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();
@@ -187,40 +188,16 @@ class HttpEpicTaskManagerTest {
         assertEquals(404, response.statusCode());
     }
 
-    @DisplayName("Проверка на исключение подзадача пересекается с существующей по времени")
+    @DisplayName("Проверка на исключение эпик не найден по id")
     @Test
-    void getThrow_GetThrow_IntersectionTask() throws IOException, InterruptedException {
-        // given
-        JsonObject jsonEpic = new JsonObject();
-        jsonEpic.addProperty("name", "Epic");
-        jsonEpic.addProperty("description", "Testing epic 1");
-
-        String epicJson = gson.toJson(jsonEpic);
+    void getThrow_GetThrow_NotFoundEpicById() throws IOException, InterruptedException {
 
         HttpClient client = HttpClient.newHttpClient();
-        URI url = URI.create(SERVER_URL + "/epics");
-        HttpRequest request = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(epicJson)).build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(201, response.statusCode());
-
-        JsonObject jsonObjectSubTask = new JsonObject();
-        jsonObjectSubTask.addProperty("name", "Test 2");
-        jsonObjectSubTask.addProperty("description", "Testing task 2");
-        jsonObjectSubTask.addProperty("status", "NEW");
-        jsonObjectSubTask.addProperty("epicId", "0");
-        jsonObjectSubTask.addProperty("duration", "PT29M");
-        jsonObjectSubTask.addProperty("startTime", "2025 01 01 01 01");
-
-        String subTaskJson = gson.toJson(jsonObjectSubTask);
-        url = URI.create(SERVER_URL + "/subtasks");
-        request = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(subTaskJson)).build();
-        response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(201, response.statusCode());
-
-        url = URI.create(SERVER_URL + "/subtasks");
-        request = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(subTaskJson)).build();
-        response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(406, response.statusCode());
+        URI url = URI.create(SERVER_URL + "/epics/0/subtasks");
+        HttpRequest request1 = HttpRequest.newBuilder().uri(url).GET().build();
+        HttpResponse<String> response1 = client.send(request1, HttpResponse.BodyHandlers.ofString());
+        assertEquals(404, response1.statusCode());
     }
+
 
 }

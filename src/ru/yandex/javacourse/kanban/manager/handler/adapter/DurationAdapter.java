@@ -6,9 +6,6 @@ import com.google.gson.stream.JsonWriter;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.time.LocalDateTime;
-
-import static ru.yandex.javacourse.kanban.Stubs.FORMATTER;
 
 public class DurationAdapter extends TypeAdapter<Duration> {
     @Override

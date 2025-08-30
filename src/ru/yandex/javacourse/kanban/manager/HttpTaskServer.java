@@ -33,13 +33,10 @@ public class HttpTaskServer {
         return gson;
     }
 
-    public HttpTaskServer(TaskManager manager) throws IOException {
+    public HttpTaskServer(TaskManager manager, HistoryManager historyManager) throws IOException {
         httpServer = HttpServer.create();
         httpServer.bind(new InetSocketAddress(PORT), 0);
         this.manager = manager;
-
-        HistoryManager historyManager = Managers.getDefaultHistory();
-        manager.setHistoryManager(historyManager);
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateAdapter());
@@ -64,9 +61,10 @@ public class HttpTaskServer {
 
     public static void main(String[] args) throws HttpServerCreateException {
         TaskManager manager = Managers.getDefault();
+        HistoryManager historyManager = Managers.getDefaultHistory();
 
         try {
-            HttpTaskServer httpTaskServer = new HttpTaskServer(manager);
+            HttpTaskServer httpTaskServer = new HttpTaskServer(manager, historyManager);
             httpTaskServer.start();
             System.out.println("HTTP-сервер запущен на " + PORT + " порту!");
             httpTaskServer.stop();

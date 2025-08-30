@@ -6,9 +6,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import ru.yandex.javacourse.kanban.manager.HttpTaskServer;
-import ru.yandex.javacourse.kanban.manager.InMemoryTaskManager;
-import ru.yandex.javacourse.kanban.manager.TaskManager;
+import ru.yandex.javacourse.kanban.manager.*;
 import ru.yandex.javacourse.kanban.task.SubTask;
 
 import java.io.IOException;
@@ -24,7 +22,8 @@ import static ru.yandex.javacourse.kanban.StubsTest.SERVER_URL;
 
 class HttpSubTaskTaskManagerTest {
     TaskManager manager = new InMemoryTaskManager();
-    HttpTaskServer taskServer = new HttpTaskServer(manager);
+    HistoryManager historyManager = new InMemoryHistoryManager();
+    HttpTaskServer taskServer = new HttpTaskServer(manager, historyManager);
     Gson gson = taskServer.getGson();
 
     public HttpSubTaskTaskManagerTest() throws IOException {
@@ -138,6 +137,7 @@ class HttpSubTaskTaskManagerTest {
         assertEquals(1, subTasksFromManager.size(), "Некорректное количество подзадач");
         assertEquals("Test Обновлено", subTasksFromManager.get(0).getName(), "Некорректное имя подзадачи");
     }
+
     @DisplayName("Удаление подзадачи")
     @Test
     void deleteSubTask_Delete_SubTaskToHttpServer() throws IOException, InterruptedException {

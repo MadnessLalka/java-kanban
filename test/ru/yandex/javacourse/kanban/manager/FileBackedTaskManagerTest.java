@@ -457,8 +457,8 @@ public class FileBackedTaskManagerTest {
         //then
 
         assertThrows(IntersectionException.class, () -> {
-                    fileBackedTaskManager.createTask(newTask1);
-                }, "Создать задачу с пересечение по времени - невозможно");
+            fileBackedTaskManager.createTask(newTask1);
+        }, "Создать задачу с пересечение по времени - невозможно");
 
     }
 
