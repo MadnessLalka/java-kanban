@@ -9,6 +9,8 @@ import ru.yandex.javacourse.kanban.manager.handler.exception.HttpHandlerQueryExc
 
 import java.io.IOException;
 
+import static ru.yandex.javacourse.kanban.manager.handler.Stubs.HTTP_500;
+
 public class PrioritizedHandler extends BaseHttpHandler implements HttpHandler {
     private final TaskManager taskManager;
     private final Gson gson;
@@ -41,7 +43,10 @@ public class PrioritizedHandler extends BaseHttpHandler implements HttpHandler {
                 sendNotFound(exchange, "Такого запроса нет в списке");
             }
         } catch (IOException e) {
+            exchange.sendResponseHeaders(HTTP_500, 0);
             throw new HttpHandlerQueryException("Ошибка при обращение к EpicHandler", e);
+        } finally {
+            exchange.close();
         }
     }
 }

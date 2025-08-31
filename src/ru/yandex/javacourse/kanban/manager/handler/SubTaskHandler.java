@@ -14,6 +14,8 @@ import ru.yandex.javacourse.kanban.task.SubTask;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+import static ru.yandex.javacourse.kanban.manager.handler.Stubs.*;
+
 public class SubTaskHandler extends BaseHttpHandler implements HttpHandler {
     private final TaskManager taskManager;
     private final Gson gson;
@@ -24,7 +26,7 @@ public class SubTaskHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     @Override
-    public void handle(HttpExchange exchange) throws HttpHandlerQueryException {
+    public void handle(HttpExchange exchange) throws IOException {
         try {
             String method = exchange.getRequestMethod();
             System.out.println("Обработка метода " + method + " /subtasks");
@@ -60,31 +62,32 @@ public class SubTaskHandler extends BaseHttpHandler implements HttpHandler {
 
                         try {
                             taskManager.createSubTask(newSubTask);
-                            exchange.sendResponseHeaders(201, 0);
-                            exchange.close();
+                            exchange.sendResponseHeaders(HTTP_201, 0);
                         } catch (IntersectionException e) {
                             sendHasOverlaps(exchange, e.getLocalizedMessage());
+                        } finally {
+                            exchange.close();
                         }
                     } else if (requestString.length == 2 && requestJson.contains("id")) {
                         SubTask newSubTask = gson.fromJson(subTaskObject, SubTask.class);
                         try {
                             taskManager.updateSubTask(newSubTask);
-                            exchange.sendResponseHeaders(201, 0);
-                            exchange.close();
+                            exchange.sendResponseHeaders(HTTP_201, 0);
                         } catch (NotFoundException e) {
                             sendNotFound(exchange, e.getLocalizedMessage());
                         } catch (IntersectionException e) {
                             sendHasOverlaps(exchange, e.getLocalizedMessage());
+                        } finally {
+                            exchange.close();
                         }
                     }
                 }
                 case "DELETE" -> {
                     int id = Integer.parseInt(requestString[2]);
 
-                    try {
+                    try (exchange) {
                         taskManager.removeSubTaskById(id);
-                        exchange.sendResponseHeaders(200, 0);
-                        exchange.close();
+                        exchange.sendResponseHeaders(HTTP_200, 0);
                     } catch (NotFoundException e) {
                         sendNotFound(exchange, e.getLocalizedMessage());
                     }
@@ -95,7 +98,10 @@ public class SubTaskHandler extends BaseHttpHandler implements HttpHandler {
                 }
             }
         } catch (IOException e) {
+            exchange.sendResponseHeaders(HTTP_500, 0);
             throw new HttpHandlerQueryException("Ошибка при обращение к SubTaskHandler", e);
+        } finally {
+            exchange.close();
         }
     }
 }

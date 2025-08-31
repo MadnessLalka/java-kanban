@@ -220,6 +220,6 @@ class HttpTaskManagerTest {
         request = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(taskJson)).build();
         response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(406, response.statusCode());
+        client.close();
     }
-
 }

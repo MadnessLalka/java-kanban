@@ -62,9 +62,10 @@ public class HttpTaskServer {
     public static void main(String[] args) throws HttpServerCreateException {
         TaskManager manager = Managers.getDefault();
         HistoryManager historyManager = Managers.getDefaultHistory();
+        HttpTaskServer httpTaskServer;
 
         try {
-            HttpTaskServer httpTaskServer = new HttpTaskServer(manager, historyManager);
+            httpTaskServer = new HttpTaskServer(manager, historyManager);
             httpTaskServer.start();
             System.out.println("HTTP-сервер запущен на " + PORT + " порту!");
             httpTaskServer.stop();

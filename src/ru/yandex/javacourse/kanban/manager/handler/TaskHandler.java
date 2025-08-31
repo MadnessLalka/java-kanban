@@ -14,6 +14,8 @@ import ru.yandex.javacourse.kanban.task.Task;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+import static ru.yandex.javacourse.kanban.manager.handler.Stubs.*;
+
 public class TaskHandler extends BaseHttpHandler implements HttpHandler {
     private final TaskManager taskManager;
     private final Gson gson;
@@ -24,12 +26,11 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     @Override
-    public void handle(HttpExchange exchange) throws HttpHandlerQueryException {
+    public void handle(HttpExchange exchange) throws IOException {
         try {
+            String path = exchange.getRequestURI().getPath();
             String method = exchange.getRequestMethod();
             System.out.println("Обработка метода " + method + " /tasks");
-
-            String path = exchange.getRequestURI().getPath();
 
             String[] requestString = path.split("/");
             String resource = "";
@@ -61,17 +62,17 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
 
                         try {
                             taskManager.createTask(newTask);
-                            exchange.sendResponseHeaders(201, 0);
-                            exchange.close();
+                            exchange.sendResponseHeaders(HTTP_201, 0);
                         } catch (IntersectionException e) {
                             sendHasOverlaps(exchange, e.getLocalizedMessage());
+                        } finally {
+                            exchange.close();
                         }
                     } else if (requestString.length == 2 && requestJson.contains("id")) {
                         Task newTask = gson.fromJson(taskObject, Task.class);
                         try {
                             taskManager.updateTask(newTask);
-                            exchange.sendResponseHeaders(201, 0);
-                            exchange.close();
+                            exchange.sendResponseHeaders(HTTP_201, 0);
                         } catch (NotFoundException e) {
                             sendNotFound(exchange, e.getLocalizedMessage());
                         } catch (IntersectionException e) {
@@ -84,8 +85,7 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
 
                     try {
                         taskManager.removeTaskById(id);
-                        exchange.sendResponseHeaders(200, 0);
-                        exchange.close();
+                        exchange.sendResponseHeaders(HTTP_200, 0);
                     } catch (NotFoundException e) {
                         sendNotFound(exchange, e.getLocalizedMessage());
                     }
@@ -97,7 +97,10 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
             }
 
         } catch (IOException e) {
+            exchange.sendResponseHeaders(HTTP_500, 0);
             throw new HttpHandlerQueryException("Ошибка при обращение к TaskHandler", e);
+        } finally {
+            exchange.close();
         }
     }
 }

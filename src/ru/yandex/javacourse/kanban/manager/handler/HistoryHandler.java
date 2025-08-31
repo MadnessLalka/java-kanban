@@ -8,6 +8,8 @@ import ru.yandex.javacourse.kanban.manager.handler.exception.HttpHandlerQueryExc
 
 import java.io.IOException;
 
+import static ru.yandex.javacourse.kanban.manager.handler.Stubs.HTTP_500;
+
 public class HistoryHandler extends BaseHttpHandler implements HttpHandler {
     private final HistoryManager historyManager;
     private final Gson gson;
@@ -29,7 +31,6 @@ public class HistoryHandler extends BaseHttpHandler implements HttpHandler {
             String resource = "";
             if (method.equals("GET")) {
                 if (requestString.length == 2) {
-                    System.out.println(historyManager.getHistory());
                     resource = gson.toJson(historyManager.getHistory());
                     System.out.println(resource);
                     sendText(exchange, resource);
@@ -39,7 +40,10 @@ public class HistoryHandler extends BaseHttpHandler implements HttpHandler {
                 sendNotFound(exchange, "Такого запроса нет в списке");
             }
         } catch (IOException e) {
+            exchange.sendResponseHeaders(HTTP_500,0);
             throw new HttpHandlerQueryException("Ошибка при обращение к EpicHandler", e);
+        } finally {
+            exchange.close();
         }
     }
 }
