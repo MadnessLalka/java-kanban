@@ -1,5 +1,7 @@
 package ru.yandex.javacourse.kanban.manager;
 
+import ru.yandex.javacourse.kanban.manager.exception.IntersectionException;
+import ru.yandex.javacourse.kanban.manager.exception.NotFoundException;
 import ru.yandex.javacourse.kanban.task.Epic;
 import ru.yandex.javacourse.kanban.task.SubTask;
 import ru.yandex.javacourse.kanban.task.Task;
@@ -23,29 +25,29 @@ public interface TaskManager {
 
     void removeAllSubTask();
 
-    Task getTaskById(int taskId);
+    Task getTaskById(int taskId) throws NotFoundException;
 
-    Epic getEpicById(int epicId);
+    Epic getEpicById(int epicId) throws NotFoundException;
 
-    SubTask getSubTaskById(int subTaskId);
+    SubTask getSubTaskById(int subTaskId) throws NotFoundException;
 
-    void createTask(Task task);
+    void createTask(Task task) throws IntersectionException;
 
-    void createEpic(Epic epic);
+    void createEpic(Epic epic) throws IntersectionException;
 
-    void createSubTask(SubTask subTask);
+    void createSubTask(SubTask subTask) throws IntersectionException;
 
-    void updateTask(Task task);
+    void updateTask(Task task) throws NotFoundException, IntersectionException;
 
-    void updateEpic(Epic epic);
+    void updateEpic(Epic epic) throws NotFoundException, IntersectionException;
 
-    void updateSubTask(SubTask subTask);
+    void updateSubTask(SubTask subTask) throws NotFoundException, IntersectionException;
 
-    void removeTaskById(int taskId);
+    void removeTaskById(int taskId) throws NotFoundException;
 
-    void removeEpicById(int epicId);
+    void removeEpicById(int epicId) throws NotFoundException;
 
-    void removeSubTaskById(Integer subTaskId);
+    void removeSubTaskById(Integer subTaskId) throws NotFoundException;
 
     void setHistoryManager(HistoryManager historyManager);
 

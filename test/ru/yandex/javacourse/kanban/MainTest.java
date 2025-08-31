@@ -336,7 +336,7 @@ public class MainTest {
         Task testTask = taskManager.getTaskById(taskId);
         Task updatedTask = new Task("Тестовая", "Описание первой задачи", taskId, TaskStatus.NEW,
                 Duration.of(30, ChronoUnit.MINUTES),
-                LocalDateTime.of(2025, 12, 1, 1, 1));
+                LocalDateTime.of(2025, 1, 1, 1, 1));
 
         //when
         testedTasksList.add(testTask);
@@ -383,7 +383,7 @@ public class MainTest {
         SubTask testSubTask = taskManager.getSubTaskById(subTaskId);
         SubTask updatedSubTask = new SubTask("Тестовая1", "Тест1", subTaskId, TaskStatus.NEW, epicId,
                 Duration.of(30, ChronoUnit.MINUTES),
-                LocalDateTime.of(2025, 12, 1, 1, 1));
+                LocalDateTime.of(2025, 1, 1, 1, 1));
 
         //when
         testedSubTaskList.add(testSubTask);

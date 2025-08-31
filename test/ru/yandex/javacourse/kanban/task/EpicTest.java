@@ -9,7 +9,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static ru.yandex.javacourse.kanban.Stubs.FORMATTER;
+import static ru.yandex.javacourse.kanban.StubsTest.FORMATTER;
 
 public class EpicTest {
     public static InMemoryTaskManager inMemoryTaskManager;
