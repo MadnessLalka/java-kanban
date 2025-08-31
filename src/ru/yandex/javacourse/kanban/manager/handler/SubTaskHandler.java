@@ -85,11 +85,13 @@ public class SubTaskHandler extends BaseHttpHandler implements HttpHandler {
                 case "DELETE" -> {
                     int id = Integer.parseInt(requestString[2]);
 
-                    try (exchange) {
+                    try  {
                         taskManager.removeSubTaskById(id);
                         exchange.sendResponseHeaders(HTTP_200, 0);
                     } catch (NotFoundException e) {
                         sendNotFound(exchange, e.getLocalizedMessage());
+                    } finally {
+                        exchange.close();
                     }
                 }
                 default -> {

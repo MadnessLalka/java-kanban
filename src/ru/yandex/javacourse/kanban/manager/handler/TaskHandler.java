@@ -88,6 +88,8 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
                         exchange.sendResponseHeaders(HTTP_200, 0);
                     } catch (NotFoundException e) {
                         sendNotFound(exchange, e.getLocalizedMessage());
+                    } finally {
+                        exchange.close();
                     }
                 }
                 default -> {
