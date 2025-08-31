@@ -8,6 +8,6 @@ public class Stubs {
     protected static final int HTTP_406 = 406;
     protected static final int HTTP_500 = 500;
 
-    private Stubs(){
+    private Stubs() {
     }
 }
